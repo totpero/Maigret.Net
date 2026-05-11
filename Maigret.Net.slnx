@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="icon.png" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Maigret.Net.Cli/Maigret.Net.Cli.csproj" />
+    <Project Path="src/Maigret.Net.Core/Maigret.Net.Core.csproj" />
+    <Project Path="src/Maigret.Net.Reports/Maigret.Net.Reports.csproj" />
+    <Project Path="src/Maigret.Net.Reports.Scriban/Maigret.Net.Reports.Scriban.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Maigret.Net.Core.Tests/Maigret.Net.Core.Tests.csproj" />
+    <Project Path="tests/Maigret.Net.Reports.Tests/Maigret.Net.Reports.Tests.csproj" />
+  </Folder>
+</Solution>

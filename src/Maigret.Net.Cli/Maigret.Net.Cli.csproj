@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Maigret.Net.Cli</RootNamespace>
+
+    <!-- NuGet .NET tool -->
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>maigret</ToolCommandName>
+    <PackageId>Maigret.Net.Cli</PackageId>
+    <Description>Command-line tool for hunting social media accounts and digital footprints by username across 1,800+ sites. Install globally with 'dotnet tool install --global Maigret.Net.Cli' to use the 'maigret' command in your terminal. A .NET port of Maigret (https://github.com/soxoj/maigret).</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Spectre.Console" Version="0.*" />
+    <PackageReference Include="Spectre.Console.Cli" Version="0.*" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.*" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Maigret.Net.Core\Maigret.Net.Core.csproj" />
+    <ProjectReference Include="..\Maigret.Net.Reports\Maigret.Net.Reports.csproj" />
+    <ProjectReference Include="..\Maigret.Net.Reports.Scriban\Maigret.Net.Reports.Scriban.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\icon.png" Pack="true" PackagePath="\" Condition="Exists('..\..\icon.png')" />
+  </ItemGroup>
+
+</Project>

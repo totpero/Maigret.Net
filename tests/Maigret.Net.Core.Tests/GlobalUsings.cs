@@ -1,0 +1,13 @@
+global using Maigret.Net.Core;
+global using Maigret.Net.Core.Activators;
+global using Maigret.Net.Core.Checkers;
+global using Maigret.Net.Core.Constants;
+global using Maigret.Net.Core.Errors;
+global using Maigret.Net.Core.IdExtraction;
+global using Maigret.Net.Core.Notify;
+global using Maigret.Net.Core.Permutator;
+global using Maigret.Net.Core.RecursiveSearch;
+global using Maigret.Net.Core.Results;
+global using Maigret.Net.Core.Search;
+global using Maigret.Net.Core.Sites;
+global using Maigret.Net.Core.Utils;

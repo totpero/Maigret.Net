@@ -1,0 +1,124 @@
+name: Release & Publish NuGet
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Directory.Build.props'
+
+jobs:
+  check-version:
+    name: Check version change
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract.outputs.version }}
+      changed: ${{ steps.compare.outputs.changed }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Extract current version
+        id: extract
+        run: |
+          VERSION=$(grep -oP '<Version>\K[^<]+' Directory.Build.props)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $VERSION"
+
+      - name: Check if version changed
+        id: compare
+        run: |
+          PREV_VERSION=$(git show HEAD~1:Directory.Build.props 2>/dev/null | grep -oP '<Version>\K[^<]+' || echo "")
+          CURR_VERSION=$(grep -oP '<Version>\K[^<]+' Directory.Build.props)
+          echo "Previous version: $PREV_VERSION"
+          echo "Current version: $CURR_VERSION"
+          if [ "$PREV_VERSION" != "$CURR_VERSION" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Version changed from $PREV_VERSION to $CURR_VERSION"
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Version unchanged"
+          fi
+
+  release:
+    name: Build, Publish & Release
+    needs: check-version
+    if: needs.check-version.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore Maigret.Net.slnx
+
+      - name: Build Release
+        run: dotnet build Maigret.Net.slnx --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test Maigret.Net.slnx --configuration Release --no-build --verbosity normal --filter "Category!=Integration"
+
+      - name: Pack NuGet packages
+        run: dotnet pack Maigret.Net.slnx --configuration Release --no-build --output ./nupkgs
+
+      - name: Publish to NuGet.org
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          VERSION: ${{ needs.check-version.outputs.version }}
+        run: |
+          for pkg in Maigret.Net Maigret.Net.Reports Maigret.Net.Reports.Scriban Maigret.Net.Cli; do
+            dotnet nuget push "./nupkgs/${pkg}.${VERSION}.nupkg" \
+              --api-key "$NUGET_API_KEY" \
+              --source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
+            dotnet nuget push "./nupkgs/${pkg}.${VERSION}.snupkg" \
+              --api-key "$NUGET_API_KEY" \
+              --source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
+          done
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.check-version.outputs.version }}
+          name: v${{ needs.check-version.outputs.version }}
+          body: |
+            ## Maigret.Net v${{ needs.check-version.outputs.version }}
+
+            ### Install
+
+            **CLI tool:**
+            ```bash
+            dotnet tool install --global Maigret.Net.Cli --version ${{ needs.check-version.outputs.version }}
+            ```
+
+            **Library:**
+            ```bash
+            dotnet add package Maigret.Net --version ${{ needs.check-version.outputs.version }}
+            dotnet add package Maigret.Net.Reports --version ${{ needs.check-version.outputs.version }}
+            dotnet add package Maigret.Net.Reports.Scriban --version ${{ needs.check-version.outputs.version }}
+            ```
+
+            ### NuGet Packages
+
+            - [Maigret.Net](https://www.nuget.org/packages/Maigret.Net/${{ needs.check-version.outputs.version }}) — core engine, sites database, checkers, recursive search
+            - [Maigret.Net.Reports](https://www.nuget.org/packages/Maigret.Net.Reports/${{ needs.check-version.outputs.version }}) — TXT/CSV/JSON/Markdown writers + ITemplateEngine hook
+            - [Maigret.Net.Reports.Scriban](https://www.nuget.org/packages/Maigret.Net.Reports.Scriban/${{ needs.check-version.outputs.version }}) — Scriban template engine + default HTML report
+            - [Maigret.Net.Cli](https://www.nuget.org/packages/Maigret.Net.Cli/${{ needs.check-version.outputs.version }}) — `dotnet tool` global (the `maigret` command)
+          files: |
+            ./nupkgs/Maigret.Net.${{ needs.check-version.outputs.version }}.nupkg
+            ./nupkgs/Maigret.Net.Reports.${{ needs.check-version.outputs.version }}.nupkg
+            ./nupkgs/Maigret.Net.Reports.Scriban.${{ needs.check-version.outputs.version }}.nupkg
+            ./nupkgs/Maigret.Net.Cli.${{ needs.check-version.outputs.version }}.nupkg
+          generate_release_notes: true
