@@ -7,15 +7,10 @@ namespace Maigret.Net.Cli.Infrastructure;
 /// Bridges <see cref="Spectre.Console.Cli"/>'s <see cref="ITypeRegistrar"/> to
 /// the <see cref="IServiceCollection"/> used by Maigret.
 /// </summary>
-public sealed class TypeRegistrar : ITypeRegistrar
+public sealed class TypeRegistrar(IServiceCollection services) : ITypeRegistrar
 {
-    private readonly IServiceCollection _services;
+    private readonly IServiceCollection _services = services;
     private ServiceProvider? _provider;
-
-    public TypeRegistrar(IServiceCollection services)
-    {
-        _services = services;
-    }
 
     public ITypeResolver Build()
     {

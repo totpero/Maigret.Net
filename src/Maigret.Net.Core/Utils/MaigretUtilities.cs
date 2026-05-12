@@ -13,10 +13,10 @@ public static class MaigretUtilities
     /// <summary>
     /// Default user-agent pool. Mirrors <c>DEFAULT_USER_AGENTS</c> from the Python module.
     /// </summary>
-    public static IReadOnlyList<string> DefaultUserAgents { get; } = new[]
-    {
+    public static IReadOnlyList<string> DefaultUserAgents { get; } =
+    [
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
-    };
+    ];
 
     private static readonly Random Random = Random.Shared;
 

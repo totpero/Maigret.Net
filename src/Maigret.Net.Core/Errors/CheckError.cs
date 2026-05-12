@@ -5,17 +5,11 @@ namespace Maigret.Net.Core.Errors;
 /// with bot protection / captcha / censorship / etc.
 /// Mirrors <c>maigret.errors.CheckError</c>.
 /// </summary>
-public sealed class CheckError
+public sealed class CheckError(string type, string desc = "")
 {
-    public CheckError(string type, string desc = "")
-    {
-        Type = type;
-        Desc = desc;
-    }
+    public string Type { get; } = type;
 
-    public string Type { get; }
-
-    public string Desc { get; }
+    public string Desc { get; } = desc;
 
     public override string ToString() =>
         string.IsNullOrEmpty(Desc) ? $"{Type} error" : $"{Type} error: {Desc}";

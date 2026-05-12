@@ -14,6 +14,13 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <AnalysisMode>Recommended</AnalysisMode>
 
+    <!-- Required for IDE0005 (Remove unnecessary using directives) to fire during build.
+         Roslyn quirk: without doc-file generation the IDE0005 analyzer is silenced. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Silence CS1591 (missing XML doc comment for public members); we want IDE0005
+         not the doc-coverage check. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+
     <!-- NuGet package metadata -->
     <Authors>totpero</Authors>
     <Company>totpero</Company>

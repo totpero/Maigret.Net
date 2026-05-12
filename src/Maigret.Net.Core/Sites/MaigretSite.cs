@@ -10,13 +10,13 @@ namespace Maigret.Net.Core.Sites;
 /// </summary>
 public sealed class MaigretSite
 {
-    private readonly List<string> _tags = new();
+    private readonly List<string> _tags = [];
     private readonly Dictionary<string, string> _headers = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> _errors = new(StringComparer.Ordinal);
-    private readonly List<string> _presenseStrs = new();
-    private readonly List<string> _absenceStrs = new();
-    private readonly List<string> _protection = new();
-    private readonly List<string> _mirrors = new();
+    private readonly List<string> _presenseStrs = [];
+    private readonly List<string> _absenceStrs = [];
+    private readonly List<string> _protection = [];
+    private readonly List<string> _mirrors = [];
 
     public MaigretSite(string name, JsonElement information)
     {
@@ -213,6 +213,8 @@ public sealed class MaigretSite
     /// </summary>
     public MaigretSite UpdateFromEngine(MaigretEngine engine)
     {
+        ArgumentNullException.ThrowIfNull(engine);
+
         EngineObj = engine;
         if (engine.Site.ValueKind == JsonValueKind.Object)
         {
@@ -377,6 +379,10 @@ public sealed class MaigretSite
             {
                 JsonValueKind.String => prop.Value.GetString() ?? string.Empty,
                 JsonValueKind.Number or JsonValueKind.True or JsonValueKind.False => prop.Value.ToString(),
+                JsonValueKind.Undefined => throw new NotImplementedException(),
+                JsonValueKind.Object => throw new NotImplementedException(),
+                JsonValueKind.Array => throw new NotImplementedException(),
+                JsonValueKind.Null => throw new NotImplementedException(),
                 _ => prop.Value.GetRawText(),
             };
         }

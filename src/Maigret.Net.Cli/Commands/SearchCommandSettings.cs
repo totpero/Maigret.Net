@@ -11,7 +11,7 @@ public sealed class SearchCommandSettings : CommandSettings
 {
     [CommandArgument(0, "<USERNAMES>")]
     [Description("One or more usernames (or other IDs) to search for")]
-    public string[] Usernames { get; set; } = Array.Empty<string>();
+    public string[] Usernames { get; set; } = [];
 
     // -- HTTP behavior ---------------------------------------------------------
 

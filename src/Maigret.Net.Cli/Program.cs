@@ -1,11 +1,6 @@
 using Maigret.Net.Cli;
 using Maigret.Net.Cli.Infrastructure;
 using Maigret.Net.Cli.Rendering;
-using Maigret.Net.Core;
-using Maigret.Net.Core.Activators;
-using Maigret.Net.Core.IdExtraction;
-using Maigret.Net.Core.RecursiveSearch;
-using Maigret.Net.Reports;
 using Maigret.Net.Reports.Scriban;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

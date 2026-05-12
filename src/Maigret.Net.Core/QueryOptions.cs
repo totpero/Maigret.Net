@@ -2,7 +2,6 @@
 // In Python these are loose Dict[str, Any]; in .NET we model them strongly.
 
 using System.Net;
-using Maigret.Net.Core.Checkers;
 
 namespace Maigret.Net.Core;
 
@@ -32,7 +31,7 @@ public sealed class QueryOptions
     /// <see cref="DefaultCheckerKey"/>; sites with custom <c>protocol</c> values
     /// should have a matching entry.
     /// </summary>
-    public Dictionary<string, ICheckerBase> Checkers { get; set; } = new();
+    public Dictionary<string, ICheckerBase> Checkers { get; set; } = [];
 
     /// <summary>Conventional protocol key used when a site declares no protocol.</summary>
     public const string DefaultCheckerKey = "";

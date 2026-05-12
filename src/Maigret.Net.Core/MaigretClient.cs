@@ -26,27 +26,19 @@ namespace Maigret.Net.Core;
 /// }
 /// </code>
 /// </example>
-public sealed class MaigretClient
+public sealed class MaigretClient(
+    IActivationProvider? activation = null,
+    IIdExtractor? extractor = null,
+    IRecursiveSearchEngine? recursive = null,
+    ILogger? logger = null)
 {
     private static readonly Lazy<MaigretDatabase> EmbeddedDatabase =
         new(MaigretResources.LoadEmbeddedDatabase);
 
-    private readonly IActivationProvider _activation;
-    private readonly IIdExtractor _extractor;
-    private readonly IRecursiveSearchEngine _recursive;
-    private readonly ILogger _logger;
-
-    public MaigretClient(
-        IActivationProvider? activation = null,
-        IIdExtractor? extractor = null,
-        IRecursiveSearchEngine? recursive = null,
-        ILogger? logger = null)
-    {
-        _activation = activation ?? NullActivationProvider.Instance;
-        _extractor = extractor ?? NullIdExtractor.Instance;
-        _recursive = recursive ?? new RecursiveSearchEngine();
-        _logger = logger ?? NullLogger.Instance;
-    }
+    private readonly IActivationProvider _activation = activation ?? NullActivationProvider.Instance;
+    private readonly IIdExtractor _extractor = extractor ?? NullIdExtractor.Instance;
+    private readonly IRecursiveSearchEngine _recursive = recursive ?? new RecursiveSearchEngine();
+    private readonly ILogger _logger = logger ?? NullLogger.Instance;
 
     /// <summary>
     /// Searches the embedded site database for <paramref name="username"/> and
@@ -129,7 +121,7 @@ public sealed class MaigretClient
         }
 
         var byKey = seed.ToDictionary(u => u, u => u, StringComparer.Ordinal);
-        return new Permute<string>(byKey).Gather(PermuteMode.Strict).Keys.ToList();
+        return [.. new Permute<string>(byKey).Gather(PermuteMode.Strict).Keys];
     }
 
     private static Settings BuildSettings(MaigretSearchOptions options)
@@ -165,7 +157,7 @@ public sealed class MaigretClient
 
         if (options.IgnoreSites is { Count: > 0 })
         {
-            settings.IgnoreIdsList = options.IgnoreSites.ToList();
+            settings.IgnoreIdsList = [.. options.IgnoreSites];
         }
 
         return settings;

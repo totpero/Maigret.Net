@@ -1,4 +1,3 @@
-using System.Net.Http;
 using System.Text.Json;
 
 namespace Maigret.Net.Core.Sites;
@@ -9,9 +8,9 @@ namespace Maigret.Net.Core.Sites;
 /// </summary>
 public sealed class MaigretDatabase
 {
-    private readonly List<MaigretSite> _sites = new();
-    private readonly List<MaigretEngine> _engines = new();
-    private readonly List<string> _tags = new();
+    private readonly List<MaigretSite> _sites = [];
+    private readonly List<MaigretEngine> _engines = [];
+    private readonly List<string> _tags = [];
 
     public IReadOnlyList<MaigretSite> Sites => _sites;
 
@@ -45,21 +44,23 @@ public sealed class MaigretDatabase
         var normalizedTags = ToCaseInsensitiveSet(tags);
         var normalizedExcluded = ToCaseInsensitiveSet(excludedTags);
 
-        bool Filter(MaigretSite s) =>
-            MatchesTags(s, normalizedTags) &&
+        bool Filter(MaigretSite s)
+        {
+            return MatchesTags(s, normalizedTags) &&
             !MatchesExcluded(s, normalizedExcluded) &&
             MatchesNames(s, normalizedNames) &&
             (!s.Disabled || includeDisabled || normalizedTags.Contains("disabled")) &&
             string.Equals(s.Type, idType, StringComparison.Ordinal);
+        }
 
         var filtered = _sites.Where(Filter).ToList();
         var ordered = reverse
             ? filtered.OrderByDescending(s => s.AlexaRank).ToList()
-            : filtered.OrderBy(s => s.AlexaRank).ToList();
+            : [.. filtered.OrderBy(s => s.AlexaRank)];
 
         var slice = top >= int.MaxValue
             ? ordered
-            : ordered.Take((int)Math.Min(top, int.MaxValue)).ToList();
+            : [.. ordered.Take((int)Math.Min(top, int.MaxValue))];
 
         return slice.GroupBy(s => s.Name)
                     .ToDictionary(g => g.Key, g => g.First(), StringComparer.Ordinal);
@@ -99,21 +100,27 @@ public sealed class MaigretDatabase
 
     public async Task<MaigretDatabase> LoadFromHttpAsync(string url, HttpClient client, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(url);
+        ArgumentNullException.ThrowIfNull(client);
+
         if (!url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
             !url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
         {
             throw new FileNotFoundException($"Invalid data file URL '{url}'.");
         }
 
-        using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
+        using var response = await client.GetAsync(new Uri(url), cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
             throw new FileNotFoundException($"Bad response while accessing data file URL '{url}'.");
         }
 
-        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-        using var doc = await JsonDocument.ParseAsync(stream, default, cancellationToken).ConfigureAwait(false);
-        return LoadFromJson(doc.RootElement);
+        var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        await using (stream.ConfigureAwait(false))
+        {
+            using var doc = await JsonDocument.ParseAsync(stream, default, cancellationToken).ConfigureAwait(false);
+            return LoadFromJson(doc.RootElement);
+        }
     }
 
     // ---------------------------------------------------------------------
@@ -121,7 +128,7 @@ public sealed class MaigretDatabase
     // ---------------------------------------------------------------------
 
     private static HashSet<string> ToCaseInsensitiveSet(IEnumerable<string>? source) =>
-        new(source ?? Enumerable.Empty<string>(), StringComparer.OrdinalIgnoreCase);
+        new(source ?? [], StringComparer.OrdinalIgnoreCase);
 
     private static bool MatchesTags(MaigretSite site, HashSet<string> tagFilter)
     {
@@ -161,12 +168,9 @@ public sealed class MaigretDatabase
             }
         }
 
-        if (site.Engine is not null && excludedFilter.Contains(site.Engine))
-        {
-            return true;
-        }
-
-        return !string.IsNullOrEmpty(site.Protocol) && excludedFilter.Contains(site.Protocol);
+        return site.Engine is not null && excludedFilter.Contains(site.Engine)
+            ? true
+            : !string.IsNullOrEmpty(site.Protocol) && excludedFilter.Contains(site.Protocol);
     }
 
     private static bool MatchesNames(MaigretSite site, HashSet<string> nameFilter)
@@ -176,12 +180,7 @@ public sealed class MaigretDatabase
             return true;
         }
 
-        if (nameFilter.Contains(site.Name))
-        {
-            return true;
-        }
-
-        return site.Source is not null && nameFilter.Contains(site.Source);
+        return nameFilter.Contains(site.Name) ? true : site.Source is not null && nameFilter.Contains(site.Source);
     }
 
     private void LoadTags(JsonElement document)

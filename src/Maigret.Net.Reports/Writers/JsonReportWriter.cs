@@ -1,6 +1,5 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using Maigret.Net.Core;
 
 namespace Maigret.Net.Reports.Writers;
 
@@ -22,6 +21,9 @@ public sealed class JsonReportWriter : IReportWriter
 
     public Task WriteAsync(TextWriter writer, ReportContext context, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(writer);
+        ArgumentNullException.ThrowIfNull(context);
+
         var perLine = ReportType.StartsWith("ndjson", StringComparison.OrdinalIgnoreCase);
         var claimed = context.Results.Where(r => r.Status == MaigretCheckStatus.Claimed);
 

@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Globalization;
 
 namespace Maigret.Net.Reports.Writers;
@@ -5,11 +6,16 @@ namespace Maigret.Net.Reports.Writers;
 /// <summary>CSV report with header <c>username,name,url_main,url_user,exists,http_status</c>.</summary>
 public sealed class CsvReportWriter : IReportWriter
 {
+    private static readonly SearchValues<char> CsvSpecialChars = SearchValues.Create(",\"\n\r");
+
     public string FormatId => "csv";
     public string FileExtension => "csv";
 
     public Task WriteAsync(TextWriter writer, ReportContext context, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(writer);
+        ArgumentNullException.ThrowIfNull(context);
+
         writer.WriteLine("username,name,url_main,url_user,exists,http_status");
         foreach (var r in context.Results)
         {
@@ -35,12 +41,7 @@ public sealed class CsvReportWriter : IReportWriter
             return string.Empty;
         }
 
-        var needsQuote = value.IndexOfAny(new[] { ',', '"', '\n', '\r' }) >= 0;
-        if (!needsQuote)
-        {
-            return value;
-        }
-
-        return $"\"{value.Replace("\"", "\"\"", StringComparison.Ordinal)}\"";
+        var needsQuote = value.AsSpan().ContainsAny(CsvSpecialChars);
+        return !needsQuote ? value : $"\"{value.Replace("\"", "\"\"", StringComparison.Ordinal)}\"";
     }
 }

@@ -81,6 +81,126 @@ csharp_prefer_simple_using_statement = true:suggestion
 # AV2407 — no #region
 dotnet_diagnostic.IDE0066.severity = warning   # use switch expression
 dotnet_diagnostic.IDE0290.severity = suggestion # primary constructor
+# IDE0005 — remove unnecessary using directives (ReSharper: RedundantUsingDirective).
+# Requires GenerateDocumentationFile=true in csproj to fire during build. Run
+# `dotnet format` to clean up across the solution.
+dotnet_diagnostic.IDE0005.severity = warning
+
+# -----------------------------------------------------------------------------
+# Style sweep — ReSharper-equivalent rules we want surfaced at build time.
+# Most are already implied by csharp_style_* keys above (with AnalysisMode=
+# Recommended) but the IDE codes need explicit severity to fire in `dotnet
+# build` output. They are all auto-fixable via `dotnet format style`.
+# -----------------------------------------------------------------------------
+
+# Language conventions ------------------------------------------------------
+dotnet_diagnostic.IDE0001.severity = suggestion # simplify name (System.Int32 -> int qualifier-free)
+dotnet_diagnostic.IDE0002.severity = suggestion # simplify member access
+dotnet_diagnostic.IDE0003.severity = suggestion # remove this/Me qualification
+dotnet_diagnostic.IDE0004.severity = suggestion # remove unnecessary cast
+dotnet_diagnostic.IDE0007.severity = none       # use var (we use explicit for built-ins; see csharp_style_var_*)
+dotnet_diagnostic.IDE0008.severity = none       # use explicit type (paired with IDE0007)
+dotnet_diagnostic.IDE0009.severity = suggestion # add this/Me qualification (disabled here, AV style)
+dotnet_diagnostic.IDE0010.severity = suggestion # populate switch (statement) - add missing cases
+dotnet_diagnostic.IDE0011.severity = warning    # add braces (AV1535)
+dotnet_diagnostic.IDE0016.severity = suggestion # use throw expression
+dotnet_diagnostic.IDE0017.severity = suggestion # use object initializer
+dotnet_diagnostic.IDE0018.severity = suggestion # inline variable declaration
+dotnet_diagnostic.IDE0019.severity = suggestion # use pattern matching (as + null check)
+dotnet_diagnostic.IDE0020.severity = suggestion # use pattern matching (is + cast)
+dotnet_diagnostic.IDE0021.severity = suggestion # expression body for constructors
+dotnet_diagnostic.IDE0022.severity = suggestion # expression body for methods
+dotnet_diagnostic.IDE0023.severity = suggestion # expression body for operators
+dotnet_diagnostic.IDE0024.severity = suggestion # expression body for operators (binary)
+dotnet_diagnostic.IDE0025.severity = suggestion # expression body for properties
+dotnet_diagnostic.IDE0026.severity = suggestion # expression body for indexers
+dotnet_diagnostic.IDE0027.severity = suggestion # expression body for accessors
+dotnet_diagnostic.IDE0028.severity = suggestion # use collection initializer / expression
+dotnet_diagnostic.IDE0029.severity = suggestion # use coalesce expression (nullable)
+dotnet_diagnostic.IDE0030.severity = suggestion # use coalesce expression (nullable value)
+dotnet_diagnostic.IDE0031.severity = suggestion # use null propagation
+dotnet_diagnostic.IDE0032.severity = suggestion # use auto property
+dotnet_diagnostic.IDE0033.severity = suggestion # use explicitly provided tuple name
+dotnet_diagnostic.IDE0034.severity = suggestion # default literal can be simplified
+dotnet_diagnostic.IDE0035.severity = warning    # remove unreachable code
+dotnet_diagnostic.IDE0036.severity = warning    # order modifiers
+dotnet_diagnostic.IDE0037.severity = suggestion # use inferred member name
+dotnet_diagnostic.IDE0038.severity = suggestion # use pattern matching (is type, not as)
+dotnet_diagnostic.IDE0039.severity = suggestion # use local function instead of lambda
+dotnet_diagnostic.IDE0040.severity = warning    # add accessibility modifiers
+dotnet_diagnostic.IDE0041.severity = suggestion # use is null check
+dotnet_diagnostic.IDE0042.severity = suggestion # deconstruct variable declaration
+dotnet_diagnostic.IDE0044.severity = warning    # add readonly modifier (AV1130)
+dotnet_diagnostic.IDE0045.severity = suggestion # use conditional expression for assignment
+dotnet_diagnostic.IDE0046.severity = suggestion # use conditional expression for return
+dotnet_diagnostic.IDE0047.severity = suggestion # remove unnecessary parentheses
+dotnet_diagnostic.IDE0048.severity = suggestion # add parentheses for clarity
+dotnet_diagnostic.IDE0049.severity = warning    # use language keywords (string vs String)
+dotnet_diagnostic.IDE0050.severity = suggestion # convert anonymous type to tuple
+dotnet_diagnostic.IDE0051.severity = warning    # remove unused private member
+dotnet_diagnostic.IDE0052.severity = warning    # remove unread private member
+dotnet_diagnostic.IDE0053.severity = suggestion # expression body for lambda
+dotnet_diagnostic.IDE0054.severity = suggestion # use compound assignment
+dotnet_diagnostic.IDE0055.severity = suggestion # formatting
+dotnet_diagnostic.IDE0056.severity = suggestion # use index operator
+dotnet_diagnostic.IDE0057.severity = suggestion # use range operator
+dotnet_diagnostic.IDE0058.severity = none       # remove unnecessary expression value (too noisy with Fluent APIs)
+dotnet_diagnostic.IDE0059.severity = suggestion # unnecessary value assignment
+dotnet_diagnostic.IDE0060.severity = suggestion # unused parameter
+dotnet_diagnostic.IDE0061.severity = suggestion # expression body for local function
+dotnet_diagnostic.IDE0062.severity = suggestion # make local function static
+dotnet_diagnostic.IDE0063.severity = suggestion # use simple using statement
+dotnet_diagnostic.IDE0064.severity = warning    # struct fields should be writable
+dotnet_diagnostic.IDE0065.severity = suggestion # using-directive placement (we want outside)
+dotnet_diagnostic.IDE0066.severity = warning    # use switch expression
+dotnet_diagnostic.IDE0070.severity = suggestion # use System.HashCode
+dotnet_diagnostic.IDE0071.severity = suggestion # simplify interpolation
+dotnet_diagnostic.IDE0072.severity = suggestion # populate switch expression
+dotnet_diagnostic.IDE0073.severity = none       # file header (we don't enforce a header)
+dotnet_diagnostic.IDE0074.severity = suggestion # use coalesce compound assignment
+dotnet_diagnostic.IDE0075.severity = suggestion # simplify conditional expression
+dotnet_diagnostic.IDE0076.severity = warning    # invalid global SuppressMessageAttribute
+dotnet_diagnostic.IDE0077.severity = warning    # avoid legacy format target in SuppressMessage
+dotnet_diagnostic.IDE0078.severity = suggestion # use pattern matching
+dotnet_diagnostic.IDE0079.severity = warning    # remove unnecessary suppression
+dotnet_diagnostic.IDE0080.severity = warning    # remove unnecessary suppression operator
+dotnet_diagnostic.IDE0082.severity = suggestion # convert typeof to nameof
+dotnet_diagnostic.IDE0083.severity = suggestion # use pattern matching (not operator)
+dotnet_diagnostic.IDE0084.severity = suggestion # use pattern matching (IsNot type)
+# Unnecessary-code rules ----------------------------------------------------
+dotnet_diagnostic.IDE0090.severity = suggestion # simplify new() expression
+dotnet_diagnostic.IDE0100.severity = suggestion # remove redundant equality
+dotnet_diagnostic.IDE0110.severity = suggestion # remove unnecessary discard
+dotnet_diagnostic.IDE0120.severity = suggestion # simplify LINQ expression
+# Code-quality / organization rules ----------------------------------------
+dotnet_diagnostic.IDE0130.severity = warning    # namespace does not match folder structure
+dotnet_diagnostic.IDE0140.severity = suggestion # simplify object creation
+dotnet_diagnostic.IDE0150.severity = suggestion # prefer is null over == null
+dotnet_diagnostic.IDE0160.severity = none       # block-scoped namespace (we want file-scoped)
+dotnet_diagnostic.IDE0161.severity = warning    # file-scoped namespace
+dotnet_diagnostic.IDE0170.severity = suggestion # simplify property pattern
+dotnet_diagnostic.IDE0180.severity = suggestion # use tuple to swap
+dotnet_diagnostic.IDE0200.severity = suggestion # remove unnecessary lambda
+dotnet_diagnostic.IDE0210.severity = none       # use top-level statements (we keep Program.cs as-is)
+dotnet_diagnostic.IDE0220.severity = suggestion # add explicit cast in foreach
+dotnet_diagnostic.IDE0230.severity = suggestion # use UTF-8 string literal
+dotnet_diagnostic.IDE0240.severity = warning    # remove redundant nullable directive
+dotnet_diagnostic.IDE0241.severity = warning    # remove unnecessary nullable directive
+dotnet_diagnostic.IDE0250.severity = suggestion # struct can be readonly
+dotnet_diagnostic.IDE0251.severity = suggestion # member can be readonly
+dotnet_diagnostic.IDE0260.severity = suggestion # use pattern matching
+dotnet_diagnostic.IDE0270.severity = suggestion # null check can be simplified
+dotnet_diagnostic.IDE0280.severity = suggestion # use nameof
+dotnet_diagnostic.IDE0290.severity = suggestion # primary constructor
+dotnet_diagnostic.IDE0300.severity = suggestion # collection expression for array
+dotnet_diagnostic.IDE0301.severity = suggestion # collection expression for empty
+dotnet_diagnostic.IDE0302.severity = suggestion # collection expression for stackalloc
+dotnet_diagnostic.IDE0303.severity = suggestion # collection expression for create
+dotnet_diagnostic.IDE0304.severity = suggestion # collection expression for builder
+dotnet_diagnostic.IDE0305.severity = suggestion # collection expression for fluent
+dotnet_diagnostic.IDE0306.severity = suggestion # collection expression for new
+# Naming-style rules --------------------------------------------------------
+dotnet_diagnostic.IDE1006.severity = suggestion # naming rule violation
 
 # Async naming + ConfigureAwait (AV1755 / AV1835) are enforced manually + reviews.
 
@@ -104,6 +224,11 @@ dotnet_diagnostic.CA1822.severity = suggestion
 dotnet_diagnostic.CA2007.severity = warning
 # CA2016 — propagate CancellationToken
 dotnet_diagnostic.CA2016.severity = warning
+# CA2264 — ArgumentNullException.ThrowIfNull on non-nullable params. We keep
+# defensive guards on public API because callers from netstandard2.0 / non-
+# nullable-aware projects can still pass null at runtime. CA2264 conflicts
+# with CA1062 in nullable-enabled libraries.
+dotnet_diagnostic.CA2264.severity = none
 
 # Performance / micro-optimization rules with marginal value here:
 # CA1848 — LoggerMessage delegates are noisy; AV doesn't require them
@@ -116,3 +241,36 @@ dotnet_diagnostic.CA1859.severity = none
 # default of probing sites with broken / expired certs. Site-checking results
 # are still classified through Status, not trust chains. Suppressed in code.
 dotnet_diagnostic.CA5359.severity = none
+
+# -----------------------------------------------------------------------------
+# Namespace-flatness exceptions (Microsoft-style: keep API public surface flat
+# at the package root, only "implementation" folders carry sub-namespaces).
+# -----------------------------------------------------------------------------
+
+[src/Maigret.Net.Reports/Abstractions/*.cs]
+dotnet_diagnostic.IDE0130.severity = none
+
+[src/Maigret.Net.Reports/Models/*.cs]
+dotnet_diagnostic.IDE0130.severity = none
+
+[src/Maigret.Net.Cli/Commands/*.cs]
+dotnet_diagnostic.IDE0130.severity = none
+
+# -----------------------------------------------------------------------------
+# Test-project overrides (xUnit `Method_Scenario_Expected` naming is idiomatic)
+# -----------------------------------------------------------------------------
+
+[tests/**/*.cs]
+# CA1707 — underscores in test method names. xUnit's Given_When_Then convention
+# wins over the CLI-naming rule here. Production code keeps CA1707 at default.
+dotnet_diagnostic.CA1707.severity = none
+# CA1861 — `new[] { … }` in test arrange/act blocks is more readable than a
+# named static-readonly field. Tests aren't perf-critical.
+dotnet_diagnostic.CA1861.severity = none
+# CA1869 — same rationale: tests rebuilding `JsonSerializerOptions` per call
+# is a non-issue and per-test isolation is desirable.
+dotnet_diagnostic.CA1869.severity = none
+# CA2007 — tests run on xUnit's TaskScheduler; ConfigureAwait(false) is noise.
+dotnet_diagnostic.CA2007.severity = none
+# CA1816 — test fixtures' Dispose patterns don't need SuppressFinalize.
+dotnet_diagnostic.CA1816.severity = none

@@ -1,7 +1,6 @@
 // Port of maigret/checking.py — orchestrates a single (site, username) check.
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using Maigret.Net.Core.Checkers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -45,6 +44,8 @@ public static class Checking
         IReadOnlyDictionary<string, string>? failFlags,
         bool ignore403)
     {
+        ArgumentNullException.ThrowIfNull(htmlText);
+
         if (failFlags is not null)
         {
             foreach (var (flag, msg) in failFlags)
@@ -73,12 +74,7 @@ public static class Checking
             return null;
         }
 
-        if (statusCode >= HttpStatusBoundaries.ServerErrorLowerBound)
-        {
-            return new CheckError("Server", $"{statusCode} status code");
-        }
-
-        return null;
+        return statusCode >= HttpStatusBoundaries.ServerErrorLowerBound ? new CheckError("Server", $"{statusCode} status code") : null;
     }
 
     /// <summary>
@@ -92,6 +88,9 @@ public static class Checking
         string profileUrl,
         CheckResponse response)
     {
+        ArgumentNullException.ThrowIfNull(site);
+        ArgumentNullException.ThrowIfNull(response);
+
         var fullTags = site.Tags.ToArray();
 
         if (response.Error is not null)
@@ -354,6 +353,8 @@ public static class Checking
     /// </summary>
     public static string BuildProfileUrl(MaigretSite site, string username)
     {
+        ArgumentNullException.ThrowIfNull(site);
+
         if (string.IsNullOrEmpty(site.Url))
         {
             return site.UrlMain;
@@ -407,14 +408,11 @@ public static class Checking
             return site.RequestMethod.ToLowerInvariant();
         }
 
-        if (string.Equals(site.CheckType, CheckTypes.StatusCode, StringComparison.Ordinal) &&
+        return string.Equals(site.CheckType, CheckTypes.StatusCode, StringComparison.Ordinal) &&
             !string.IsNullOrEmpty(site.RequestHeadOnly) &&
-            !string.Equals(site.RequestHeadOnly, "false", StringComparison.OrdinalIgnoreCase))
-        {
-            return "head";
-        }
-
-        return "get";
+            !string.Equals(site.RequestHeadOnly, "false", StringComparison.OrdinalIgnoreCase)
+            ? "head"
+            : "get";
     }
 
     private static object? BuildPayload(MaigretSite site, string username)
@@ -431,6 +429,13 @@ public static class Checking
             {
                 System.Text.Json.JsonValueKind.String =>
                     (prop.Value.GetString() ?? string.Empty).Replace("{username}", username, StringComparison.Ordinal),
+                System.Text.Json.JsonValueKind.Undefined => throw new NotImplementedException(),
+                System.Text.Json.JsonValueKind.Object => throw new NotImplementedException(),
+                System.Text.Json.JsonValueKind.Array => throw new NotImplementedException(),
+                System.Text.Json.JsonValueKind.Number => throw new NotImplementedException(),
+                System.Text.Json.JsonValueKind.True => throw new NotImplementedException(),
+                System.Text.Json.JsonValueKind.False => throw new NotImplementedException(),
+                System.Text.Json.JsonValueKind.Null => throw new NotImplementedException(),
                 _ => prop.Value.ToString(),
             };
         }
@@ -446,12 +451,9 @@ public static class Checking
             return checker;
         }
 
-        if (options.Checkers.TryGetValue(QueryOptions.DefaultCheckerKey, out var fallback))
-        {
-            return fallback;
-        }
-
-        return options.Checkers.Values.FirstOrDefault();
+        return options.Checkers.TryGetValue(QueryOptions.DefaultCheckerKey, out var fallback)
+            ? fallback
+            : options.Checkers.Values.FirstOrDefault();
     }
 
     private static IReadOnlyDictionary<string, string>? CombineErrors(MaigretSite site)
@@ -520,8 +522,8 @@ public static class Checking
     }
 
     private static bool IsSuccess(int statusCode) =>
-        statusCode >= HttpStatusBoundaries.OkLowerBound &&
-        statusCode < HttpStatusBoundaries.OkUpperBound;
+        statusCode is >= HttpStatusBoundaries.OkLowerBound and
+        < HttpStatusBoundaries.OkUpperBound;
 
     private static MaigretCheckStatus ResolveMessageStatus(MaigretSite site, CheckResponse response, bool presenseDetected)
     {

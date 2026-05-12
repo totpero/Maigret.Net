@@ -1,8 +1,5 @@
 using System.Net;
-using System.Net.Http;
 using System.Text.Json;
-using Maigret.Net.Core;
-using Maigret.Net.Core.Checkers;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 
@@ -12,7 +9,7 @@ public class TestMaigret
 {
     /// <summary>
     /// Builds a tiny in-memory database with a couple of fake sites that all
-    /// resolve to the local <see cref="StubChecker"/>. Avoids touching the network.
+    /// resolve to the local <see cref="StubHandler"/>. Avoids touching the network.
     /// </summary>
     private static MaigretDatabase BuildDatabase(params (string name, string url, string checkType, IEnumerable<string>? presence)[] sites)
     {
@@ -37,10 +34,10 @@ public class TestMaigret
         return db.LoadFromString(json);
     }
 
-    private sealed class StubHandler : HttpMessageHandler
+    private sealed class StubHandler(Func<HttpRequestMessage, HttpResponseMessage> responder) : HttpMessageHandler
     {
-        private readonly Func<HttpRequestMessage, HttpResponseMessage> _responder;
-        public StubHandler(Func<HttpRequestMessage, HttpResponseMessage> responder) => _responder = responder;
+        private readonly Func<HttpRequestMessage, HttpResponseMessage> _responder = responder;
+
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             => Task.FromResult(_responder(request));
     }
@@ -62,7 +59,7 @@ public class TestMaigret
 
         var request = new MaigretSearchRequest
         {
-            Usernames = new[] { "alex" },
+            Usernames = ["alex"],
             Database = db,
             Settings = settings,
             Checkers = checkers,
@@ -91,7 +88,7 @@ public class TestMaigret
 
         var filter = new SearchFilter
         {
-            SiteNames = new[] { "FooSite", "QuxSite" },
+            SiteNames = ["FooSite", "QuxSite"],
             ScanAllSites = true,
         };
 
@@ -100,7 +97,7 @@ public class TestMaigret
 
         var request = new MaigretSearchRequest
         {
-            Usernames = new[] { "alex" },
+            Usernames = ["alex"],
             Database = db,
             Settings = settings,
             Filter = filter,
@@ -114,7 +111,7 @@ public class TestMaigret
         }
 
         results.Count.ShouldBe(2);
-        results.Select(r => r.SiteName).OrderBy(n => n).ShouldBe(new[] { "FooSite", "QuxSite" });
+        results.Select(r => r.SiteName).OrderBy(n => n).ShouldBe(["FooSite", "QuxSite"]);
     }
 
     [Fact]
@@ -133,7 +130,7 @@ public class TestMaigret
 
         var request = new MaigretSearchRequest
         {
-            Usernames = new[] { "alex" },
+            Usernames = ["alex"],
             Database = db,
             Settings = settings,
             Checkers = checkers,
@@ -156,7 +153,7 @@ public class TestMaigret
 
         var request = new MaigretSearchRequest
         {
-            Usernames = Array.Empty<string>(),
+            Usernames = [],
             Database = db,
             Settings = settings,
         };
@@ -180,7 +177,7 @@ public class TestMaigret
 
         var request = new MaigretSearchRequest
         {
-            Usernames = new[] { "alex" },
+            Usernames = ["alex"],
             Database = db,
             Settings = settings,
             Checkers = checkers,
@@ -210,7 +207,7 @@ public class TestMaigret
 
         var request = new MaigretSearchRequest
         {
-            Usernames = new[] { "alex" },
+            Usernames = ["alex"],
             Database = db,
             Settings = settings,
             Extractor = stubExtractor,
@@ -250,7 +247,7 @@ public class TestMaigret
         // Use a site filter with a name that doesn't exist so no real network calls happen.
         var filter = new SearchFilter
         {
-            SiteNames = new[] { "this-site-name-definitely-does-not-exist" },
+            SiteNames = ["this-site-name-definitely-does-not-exist"],
             ScanAllSites = true,
         };
         var settings = Settings.LoadFromEmbedded();
@@ -264,10 +261,10 @@ public class TestMaigret
         results.ShouldBeEmpty();
     }
 
-    private sealed class StaticExtractor : IIdExtractor
+    private sealed class StaticExtractor(IReadOnlyDictionary<string, string> data) : IIdExtractor
     {
-        private readonly IReadOnlyDictionary<string, string> _data;
-        public StaticExtractor(IReadOnlyDictionary<string, string> data) => _data = data;
+        private readonly IReadOnlyDictionary<string, string> _data = data;
+
         public IReadOnlyDictionary<string, string> Extract(string htmlText, MaigretSite site) => _data;
     }
 }

@@ -10,14 +10,9 @@ namespace Maigret.Net.Core.Checkers;
 /// DNS-based domain resolver. Returns <c>(ip, 200, null)</c> when the host
 /// resolves and <c>("", 404, null)</c> when it does not.
 /// </summary>
-public sealed class DomainResolver : ICheckerBase
+public sealed class DomainResolver(ILogger? logger = null) : ICheckerBase
 {
-    private readonly ILogger _logger;
-
-    public DomainResolver(ILogger? logger = null)
-    {
-        _logger = logger ?? NullLogger.Instance;
-    }
+    private readonly ILogger _logger = logger ?? NullLogger.Instance;
 
     public async Task<CheckResponse> CheckAsync(
         string url,
@@ -42,12 +37,7 @@ public sealed class DomainResolver : ICheckerBase
             }
 
             var addresses = await Dns.GetHostAddressesAsync(url, timeoutCts.Token).ConfigureAwait(false);
-            if (addresses.Length == 0)
-            {
-                return new CheckResponse(string.Empty, 404, null);
-            }
-
-            return new CheckResponse(addresses[0].ToString(), 200, null);
+            return addresses.Length == 0 ? new CheckResponse(string.Empty, 404, null) : new CheckResponse(addresses[0].ToString(), 200, null);
         }
         catch (SocketException)
         {

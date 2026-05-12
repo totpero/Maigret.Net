@@ -10,20 +10,15 @@ namespace Maigret.Net.Core.IdExtraction;
 /// Concrete <see cref="IIdExtractor"/> backed by a collection of <see cref="ExtractionRule"/>s.
 /// Lookups are case-insensitive on <see cref="ExtractionRule.SiteName"/>.
 /// </summary>
-public sealed class RuleBasedIdExtractor : IIdExtractor
+public sealed class RuleBasedIdExtractor(IEnumerable<ExtractionRule> rules) : IIdExtractor
 {
-    private readonly IReadOnlyDictionary<string, IReadOnlyList<ExtractionRule>> _rulesBySite;
-    private static readonly IReadOnlyDictionary<string, string> Empty = new Dictionary<string, string>(0);
-
-    public RuleBasedIdExtractor(IEnumerable<ExtractionRule> rules)
-    {
-        _rulesBySite = rules
+    private readonly IReadOnlyDictionary<string, IReadOnlyList<ExtractionRule>> _rulesBySite = rules
             .GroupBy(r => r.SiteName, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(
                 g => g.Key,
-                g => (IReadOnlyList<ExtractionRule>)g.ToList(),
+                g => (IReadOnlyList<ExtractionRule>)[.. g],
                 StringComparer.OrdinalIgnoreCase);
-    }
+    private static readonly IReadOnlyDictionary<string, string> Empty = new Dictionary<string, string>(0);
 
     public IReadOnlyDictionary<string, string> Extract(string htmlText, MaigretSite site)
     {

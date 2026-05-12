@@ -1,9 +1,6 @@
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using Maigret.Net.Core;
-using Maigret.Net.Core.Activators;
 using Shouldly;
 
 namespace Maigret.Net.Core.Tests;
@@ -44,7 +41,7 @@ public class TestActivation
     private sealed class StubHandler : HttpMessageHandler
     {
         public Func<HttpRequestMessage, HttpResponseMessage> Responder { get; init; } = _ => new HttpResponseMessage(HttpStatusCode.OK);
-        public List<HttpRequestMessage> Captured { get; } = new();
+        public List<HttpRequestMessage> Captured { get; } = [];
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -71,7 +68,7 @@ public class TestActivation
         var site = SiteWithActivation("twitter", new { url = "https://x.test", src = "guest_token" });
         // Wipe activation to simulate "no marks found yet" case — provider doesn't gatekeep on marks.
         // We just assert that having no matching activator → CanActivate=false.
-        var provider = new MethodBasedActivationProvider(Array.Empty<ISiteActivator>());
+        var provider = new MethodBasedActivationProvider([]);
         provider.CanActivate(site).ShouldBeFalse();
     }
 
@@ -79,7 +76,7 @@ public class TestActivation
     public async Task MethodBased_DispatchesToMatchingActivator()
     {
         var fake = new FakeActivator { Method = "vimeo" };
-        var provider = new MethodBasedActivationProvider(new[] { (ISiteActivator)fake });
+        var provider = new MethodBasedActivationProvider([fake]);
 
         var site = SiteWithActivation("vimeo", new { url = "https://api.vimeo.com" });
         provider.CanActivate(site).ShouldBeTrue();

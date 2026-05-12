@@ -1,9 +1,6 @@
 // DI registration for consumers that want Maigret available via constructor injection.
-using System.Net.Http;
-using Maigret.Net.Core.Checkers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 
 namespace Maigret.Net.Core;
 

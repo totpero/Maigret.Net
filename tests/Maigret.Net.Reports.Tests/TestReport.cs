@@ -1,9 +1,5 @@
 using System.Globalization;
 using System.Text.Json;
-using Maigret.Net.Core;
-using Maigret.Net.Reports;
-using Maigret.Net.Reports.Scriban;
-using Maigret.Net.Reports.Writers;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 
@@ -15,12 +11,12 @@ public class TestReport
         "alex", "GitHub", "https://github.com/alex", MaigretCheckStatus.Claimed,
         idsData: new Dictionary<string, string> { ["fullname"] = "Alex Aim", ["bio"] = "Builder" },
         queryTime: TimeSpan.FromMilliseconds(123),
-        tags: new[] { "social", "us" });
+        tags: ["social", "us"]);
 
     private static readonly MaigretCheckResult Claimed2 = new(
         "alex", "Twitter", "https://twitter.com/alex", MaigretCheckStatus.Claimed,
         queryTime: TimeSpan.FromMilliseconds(456),
-        tags: new[] { "social", "global" });
+        tags: ["social", "global"]);
 
     private static readonly MaigretCheckResult NotFound = new(
         "alex", "FakeBook", "https://fake.invalid/alex", MaigretCheckStatus.Available);
@@ -29,7 +25,7 @@ public class TestReport
         "alex", "BrokeSite", "https://broke.invalid/alex", MaigretCheckStatus.Unknown,
         error: new CheckError("Bot protection", "Cloudflare"));
 
-    private static readonly IReadOnlyList<MaigretCheckResult> Sample = new[] { Claimed1, NotFound, Claimed2, ErrorSite };
+    private static readonly IReadOnlyList<MaigretCheckResult> Sample = [Claimed1, NotFound, Claimed2, ErrorSite];
 
     private static ReportContext BuildContext() =>
         new("alex", Sample,
@@ -131,7 +127,7 @@ public class TestReport
             };
             var pipeline = new ReportPipeline(writers);
 
-            await pipeline.WriteToFolderAsync(dir, BuildContext(), new[] { "txt", "csv", "json", "markdown" });
+            await pipeline.WriteToFolderAsync(dir, BuildContext(), ["txt", "csv", "json", "markdown"]);
 
             File.Exists(Path.Combine(dir, "report_alex.txt")).ShouldBeTrue();
             File.Exists(Path.Combine(dir, "report_alex.csv")).ShouldBeTrue();
@@ -153,7 +149,7 @@ public class TestReport
         var writers = sp.GetServices<IReportWriter>().ToArray();
 
         writers.Length.ShouldBe(4);
-        writers.Select(w => w.FormatId).OrderBy(id => id).ShouldBe(new[] { "csv", "json", "markdown", "txt" });
+        writers.Select(w => w.FormatId).OrderBy(id => id).ShouldBe(["csv", "json", "markdown", "txt"]);
 
         var pipeline = sp.GetRequiredService<ReportPipeline>();
         pipeline.Supports("txt").ShouldBeTrue();

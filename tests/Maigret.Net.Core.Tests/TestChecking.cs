@@ -1,8 +1,5 @@
 using System.Net;
-using System.Net.Http;
 using System.Text.Json;
-using Maigret.Net.Core;
-using Maigret.Net.Core.Checkers;
 using Shouldly;
 
 namespace Maigret.Net.Core.Tests;
@@ -58,16 +55,10 @@ public class TestChecking
     }
 
     [Fact]
-    public void DetectErrorPage_403_Ignored_ReturnsNull()
-    {
-        Checking.DetectErrorPage("ok", 403, null, ignore403: true).ShouldBeNull();
-    }
+    public void DetectErrorPage_403_Ignored_ReturnsNull() => Checking.DetectErrorPage("ok", 403, null, ignore403: true).ShouldBeNull();
 
     [Fact]
-    public void DetectErrorPage_999_ReturnsNull()
-    {
-        Checking.DetectErrorPage("blocked", 999, null, ignore403: false).ShouldBeNull();
-    }
+    public void DetectErrorPage_999_ReturnsNull() => Checking.DetectErrorPage("blocked", 999, null, ignore403: false).ShouldBeNull();
 
     [Fact]
     public void DetectErrorPage_500_ReturnsServerError()
@@ -92,7 +83,7 @@ public class TestChecking
     public void InterpretResponse_Message_Presence_NoAbsence_Claimed()
     {
         var site = BuildSite("Foo", "https://foo.com/{username}", "https://foo.com/", "message",
-            presence: new[] { "profile" });
+            presence: ["profile"]);
         var resp = new CheckResponse("welcome to my profile", 200, null);
         var r = Checking.InterpretResponse(site, "alex", "https://foo.com/alex", resp);
         r.Status.ShouldBe(MaigretCheckStatus.Claimed);
@@ -102,7 +93,7 @@ public class TestChecking
     public void InterpretResponse_Message_AbsenceWins()
     {
         var site = BuildSite("Foo", "https://foo.com/{username}", "https://foo.com/", "message",
-            presence: new[] { "profile" }, absence: new[] { "user not found" });
+            presence: ["profile"], absence: ["user not found"]);
         var resp = new CheckResponse("user not found, profile missing", 200, null);
         var r = Checking.InterpretResponse(site, "alex", "https://foo.com/alex", resp);
         r.Status.ShouldBe(MaigretCheckStatus.Available);
@@ -130,7 +121,7 @@ public class TestChecking
     public void InterpretResponse_ResponseUrl_2xxAndPresence_Claimed()
     {
         var site = BuildSite("Foo", "https://foo.com/{username}", "https://foo.com/", "response_url",
-            presence: new[] { "ok" });
+            presence: ["ok"]);
         var resp = new CheckResponse("ok page", 200, null);
         Checking.InterpretResponse(site, "alex", "https://foo.com/alex", resp).Status
             .ShouldBe(MaigretCheckStatus.Claimed);
@@ -140,7 +131,7 @@ public class TestChecking
     public void InterpretResponse_ResponseUrl_NoPresence_Available()
     {
         var site = BuildSite("Foo", "https://foo.com/{username}", "https://foo.com/", "response_url",
-            presence: new[] { "ok" });
+            presence: ["ok"]);
         var resp = new CheckResponse("redirected", 200, null);
         Checking.InterpretResponse(site, "alex", "https://foo.com/alex", resp).Status
             .ShouldBe(MaigretCheckStatus.Available);
@@ -278,10 +269,10 @@ public class TestChecking
         resp.Error?.Type.ShouldBe("Bot protection");
     }
 
-    private sealed class StubHandler : HttpMessageHandler
+    private sealed class StubHandler(Func<HttpRequestMessage, HttpResponseMessage> responder) : HttpMessageHandler
     {
-        private readonly Func<HttpRequestMessage, HttpResponseMessage> _responder;
-        public StubHandler(Func<HttpRequestMessage, HttpResponseMessage> responder) => _responder = responder;
+        private readonly Func<HttpRequestMessage, HttpResponseMessage> _responder = responder;
+
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             => Task.FromResult(_responder(request));
     }

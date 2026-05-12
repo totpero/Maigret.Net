@@ -1,5 +1,3 @@
-using Maigret.Net.Core;
-
 namespace Maigret.Net.Reports.Writers;
 
 /// <summary>Plain-text report (one claimed profile URL per line + a summary footer).</summary>
@@ -10,6 +8,9 @@ public sealed class TxtReportWriter : IReportWriter
 
     public Task WriteAsync(TextWriter writer, ReportContext context, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(writer);
+        ArgumentNullException.ThrowIfNull(context);
+
         var count = 0;
         foreach (var r in context.Results)
         {

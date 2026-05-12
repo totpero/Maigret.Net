@@ -10,10 +10,7 @@ public class QueryNotify
 
     public virtual void Start(string? message = null, string idType = "username") { }
 
-    public virtual void Update(MaigretCheckResult result, bool isSimilar = false)
-    {
-        Result = result;
-    }
+    public virtual void Update(MaigretCheckResult result, bool isSimilar = false) => Result = result;
 
     public virtual void Finish(string? message = null) { }
 

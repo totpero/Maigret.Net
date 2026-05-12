@@ -1,6 +1,5 @@
 // Port of maigret/tests/test_data.py — data.json integrity checks.
 
-using Maigret.Net.Core;
 using Shouldly;
 
 namespace Maigret.Net.Core.Tests;
@@ -9,14 +8,14 @@ public class TestData
 {
     private const int TopSitesAlexaRankLimit = 50;
 
-    private static readonly IReadOnlyList<string> KnownSocialDomains = new[]
-    {
+    private static readonly IReadOnlyList<string> KnownSocialDomains =
+    [
         "facebook.com", "instagram.com", "twitter.com", "tiktok.com",
         "vk.com", "reddit.com", "pinterest.com", "snapchat.com",
         "linkedin.com", "tumblr.com", "threads.net", "bsky.app",
         "myspace.com", "weibo.com", "mastodon.social", "gab.com",
         "minds.com", "clubhouse.com",
-    };
+    ];
 
     private static readonly Lazy<MaigretDatabase> Db = new(MaigretResources.LoadEmbeddedDatabase);
 
@@ -51,7 +50,7 @@ public class TestData
     {
         var db = Db.Value;
         var topSites = db.Sites
-            .Where(s => s.AlexaRank > 0 && s.AlexaRank < long.MaxValue)
+            .Where(s => s.AlexaRank is > 0 and < long.MaxValue)
             .OrderBy(s => s.AlexaRank)
             .Take(TopSitesAlexaRankLimit)
             .ToList();

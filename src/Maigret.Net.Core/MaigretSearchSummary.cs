@@ -4,26 +4,20 @@ namespace Maigret.Net.Core;
 /// Aggregate result returned by <see cref="MaigretClient.SearchAsync(string, MaigretSearchOptions?, System.Threading.CancellationToken)"/>.
 /// Bundles the full result list with the convenience views consumers usually want.
 /// </summary>
-public sealed class MaigretSearchSummary
+public sealed class MaigretSearchSummary(
+    string username,
+    IReadOnlyList<MaigretCheckResult> results,
+    TimeSpan elapsed)
 {
-    public MaigretSearchSummary(
-        string username,
-        IReadOnlyList<MaigretCheckResult> results,
-        TimeSpan elapsed)
-    {
-        Username = username;
-        Results = results;
-        Elapsed = elapsed;
-    }
 
     /// <summary>The first username searched. For multi-username runs, see individual results.</summary>
-    public string Username { get; }
+    public string Username { get; } = username;
 
     /// <summary>All probed results, regardless of status.</summary>
-    public IReadOnlyList<MaigretCheckResult> Results { get; }
+    public IReadOnlyList<MaigretCheckResult> Results { get; } = results;
 
     /// <summary>Wall-clock duration of the search.</summary>
-    public TimeSpan Elapsed { get; }
+    public TimeSpan Elapsed { get; } = elapsed;
 
     /// <summary>Sites where the username was found.</summary>
     public IEnumerable<MaigretCheckResult> ClaimedSites =>
@@ -59,6 +53,6 @@ public sealed class MaigretSearchSummary
                .GroupBy(r => r.Username, StringComparer.Ordinal)
                .ToDictionary(
                    g => g.Key,
-                   g => (IReadOnlyList<MaigretCheckResult>)g.ToList(),
+                   g => (IReadOnlyList<MaigretCheckResult>)[.. g],
                    StringComparer.Ordinal);
 }

@@ -1,9 +1,5 @@
 using System.Net;
-using System.Net.Http;
 using System.Text.Json;
-using Maigret.Net.Core;
-using Maigret.Net.Core.Checkers;
-using Maigret.Net.Core.RecursiveSearch;
 using Shouldly;
 
 namespace Maigret.Net.Core.Tests;
@@ -49,7 +45,7 @@ public class TestRecursiveSearch
             ["usernames"] = "['x','y','z']",
         };
         var ids = RecursiveSearchEngine.ParseUsernames(data).Select(x => x.Id).OrderBy(s => s).ToArray();
-        ids.ShouldBe(new[] { "x", "y", "z" });
+        ids.ShouldBe(["x", "y", "z"]);
     }
 
     [Fact]
@@ -85,19 +81,19 @@ public class TestRecursiveSearch
         return new MaigretDatabase().LoadFromString(json);
     }
 
-    private sealed class StaticHandler : HttpMessageHandler
+    private sealed class StaticHandler(Func<HttpRequestMessage, HttpResponseMessage> r) : HttpMessageHandler
     {
-        private readonly Func<HttpRequestMessage, HttpResponseMessage> _r;
-        public StaticHandler(Func<HttpRequestMessage, HttpResponseMessage> r) => _r = r;
+        private readonly Func<HttpRequestMessage, HttpResponseMessage> _r = r;
+
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             => Task.FromResult(_r(request));
     }
 
-    private sealed class StaticExtractor : IIdExtractor
+    private sealed class StaticExtractor(string siteName, IReadOnlyDictionary<string, string> data) : IIdExtractor
     {
-        private readonly IReadOnlyDictionary<string, string> _data;
-        private readonly string _siteName;
-        public StaticExtractor(string siteName, IReadOnlyDictionary<string, string> data) { _siteName = siteName; _data = data; }
+        private readonly IReadOnlyDictionary<string, string> _data = data;
+        private readonly string _siteName = siteName;
+
         public IReadOnlyDictionary<string, string> Extract(string htmlText, MaigretSite site) =>
             string.Equals(site.Name, _siteName, StringComparison.Ordinal)
                 ? _data
@@ -133,7 +129,7 @@ public class TestRecursiveSearch
         var engine = new RecursiveSearchEngine();
         var request = new MaigretSearchRequest
         {
-            Usernames = new[] { "alice" },
+            Usernames = ["alice"],
             Database = db,
             Settings = settings,
             Extractor = extractor,
@@ -169,7 +165,7 @@ public class TestRecursiveSearch
         var engine = new RecursiveSearchEngine();
         var request = new MaigretSearchRequest
         {
-            Usernames = new[] { "seed" },
+            Usernames = ["seed"],
             Database = db,
             Settings = settings,
             Extractor = extractor,
@@ -198,7 +194,7 @@ public class TestRecursiveSearch
         var engine = new RecursiveSearchEngine();
         var request = new MaigretSearchRequest
         {
-            Usernames = new[] { "alice" },
+            Usernames = ["alice"],
             Database = db,
             Settings = settings,
             Checkers = checkers,
@@ -213,10 +209,10 @@ public class TestRecursiveSearch
         results[0].Status.ShouldBe(MaigretCheckStatus.Claimed);
     }
 
-    private sealed class GeneratingExtractor : IIdExtractor
+    private sealed class GeneratingExtractor(Func<string> next) : IIdExtractor
     {
-        private readonly Func<string> _next;
-        public GeneratingExtractor(Func<string> next) => _next = next;
+        private readonly Func<string> _next = next;
+
         public IReadOnlyDictionary<string, string> Extract(string htmlText, MaigretSite site) =>
             new Dictionary<string, string> { ["username"] = _next() };
     }

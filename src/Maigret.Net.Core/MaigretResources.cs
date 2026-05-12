@@ -28,8 +28,10 @@ public static class MaigretResources
     /// <summary>
     /// Reads an embedded resource as a UTF-8 string from a specific assembly.
     /// </summary>
-    public static string ReadStringFrom(System.Reflection.Assembly assembly, string resourceName)
+    public static string ReadStringFrom(Assembly assembly, string resourceName)
     {
+        ArgumentNullException.ThrowIfNull(assembly);
+
         using var stream = assembly.GetManifestResourceStream(resourceName)
             ?? throw new FileNotFoundException(
                 $"Embedded resource '{resourceName}' not found in {assembly.GetName().Name}.");

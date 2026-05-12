@@ -17,7 +17,7 @@ public static class MaigretFactory
         Settings? settings = null,
         SearchFilter? filter = null,
         CancellationToken cancellationToken = default) =>
-        SearchManyAsync(new[] { username }, settings, filter, cancellationToken);
+        SearchManyAsync([username], settings, filter, cancellationToken);
 
     /// <summary>Searches for multiple usernames over the embedded site database.</summary>
     public static IAsyncEnumerable<MaigretCheckResult> SearchManyAsync(

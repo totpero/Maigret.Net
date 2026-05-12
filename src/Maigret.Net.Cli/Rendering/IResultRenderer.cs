@@ -1,5 +1,3 @@
-using Maigret.Net.Core;
-
 namespace Maigret.Net.Cli.Rendering;
 
 /// <summary>

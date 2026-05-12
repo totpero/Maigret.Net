@@ -1,4 +1,3 @@
-using Maigret.Net.Core;
 using Shouldly;
 
 namespace Maigret.Net.Core.Tests;
@@ -6,22 +5,13 @@ namespace Maigret.Net.Core.Tests;
 public class TestUtils
 {
     [Fact]
-    public void CaseConverter_CamelToSnake()
-    {
-        CaseConverter.CamelToSnake("SnakeCasedString").ShouldBe("snake_cased_string");
-    }
+    public void CaseConverter_CamelToSnake() => CaseConverter.CamelToSnake("SnakeCasedString").ShouldBe("snake_cased_string");
 
     [Fact]
-    public void CaseConverter_SnakeToCamel()
-    {
-        CaseConverter.SnakeToCamel("camel_cased_string").ShouldBe("camelCasedString");
-    }
+    public void CaseConverter_SnakeToCamel() => CaseConverter.SnakeToCamel("camel_cased_string").ShouldBe("camelCasedString");
 
     [Fact]
-    public void CaseConverter_CamelWithDigits_NoChange()
-    {
-        CaseConverter.CamelToSnake("ignore403").ShouldBe("ignore403");
-    }
+    public void CaseConverter_CamelWithDigits_NoChange() => CaseConverter.CamelToSnake("ignore403").ShouldBe("ignore403");
 
     [Theory]
     [InlineData("ru", true)]
@@ -30,16 +20,10 @@ public class TestUtils
     [InlineData("a1", false)]
     [InlineData("dating", false)]
     [InlineData("", false)]
-    public void TagUtils_IsCountryTag(string tag, bool expected)
-    {
-        TagUtils.IsCountryTag(tag).ShouldBe(expected);
-    }
+    public void TagUtils_IsCountryTag(string tag, bool expected) => TagUtils.IsCountryTag(tag).ShouldBe(expected);
 
     [Fact]
-    public void TagUtils_EnrichLinkStr_Plain()
-    {
-        TagUtils.EnrichLinkStr("test").ShouldBe("test");
-    }
+    public void TagUtils_EnrichLinkStr_Plain() => TagUtils.EnrichLinkStr("test").ShouldBe("test");
 
     [Fact]
     public void TagUtils_EnrichLinkStr_WrapsUrl()
@@ -53,10 +37,7 @@ public class TestUtils
     [InlineData("https://flickr.com/photos/foo", "flickr.com/photos/foo")]
     [InlineData("https://www.flickr.com/photos/foo/", "flickr.com/photos/foo")]
     [InlineData("http://m.flickr.com/photos/foo", "flickr.com/photos/foo")]
-    public void UrlMatcher_ExtractMainPart(string input, string expected)
-    {
-        UrlMatcher.ExtractMainPart(input).ShouldBe(expected);
-    }
+    public void UrlMatcher_ExtractMainPart(string input, string expected) => UrlMatcher.ExtractMainPart(input).ShouldBe(expected);
 
     [Theory]
     [InlineData("http://flickr.com/photos/{username}")]

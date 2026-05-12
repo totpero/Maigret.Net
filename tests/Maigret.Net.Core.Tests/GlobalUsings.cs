@@ -1,4 +1,3 @@
-global using Maigret.Net.Core;
 global using Maigret.Net.Core.Activators;
 global using Maigret.Net.Core.Checkers;
 global using Maigret.Net.Core.Constants;

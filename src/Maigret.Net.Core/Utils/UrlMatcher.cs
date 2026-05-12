@@ -26,12 +26,7 @@ public static class UrlMatcher
         }
 
         var match = HttpUrlRegex.Match(url);
-        if (match.Success && match.Groups[2].Value.Length > 0)
-        {
-            return match.Groups[2].Value.TrimEnd('/');
-        }
-
-        return string.Empty;
+        return match.Success && match.Groups[2].Value.Length > 0 ? match.Groups[2].Value.TrimEnd('/') : string.Empty;
     }
 
     /// <summary>

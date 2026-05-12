@@ -1,4 +1,3 @@
-using Maigret.Net.Core;
 using Shouldly;
 
 namespace Maigret.Net.Core.Tests;
@@ -14,13 +13,13 @@ public class TestErrors
     [Fact]
     public void ExtractAndGroup_RanksByFrequency()
     {
-        var stats = CommonErrors.ExtractAndGroup(new[]
-        {
+        var stats = CommonErrors.ExtractAndGroup(
+        [
             Err("Captcha"),
             Err("Bot protection"),
             Err("Captcha"),
             Ok(),
-        });
+        ]);
 
         stats.Count.ShouldBe(2);
         stats[0].Type.ShouldBe("Captcha");

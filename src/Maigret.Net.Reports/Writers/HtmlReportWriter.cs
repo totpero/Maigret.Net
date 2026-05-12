@@ -16,12 +16,13 @@ public sealed class HtmlReportWriter : IReportWriter
 
     public HtmlReportWriter(ITemplateEngine engine, string templateContent)
     {
-        _engine = engine ?? throw new ArgumentNullException(nameof(engine));
+        ArgumentNullException.ThrowIfNull(engine);
         if (string.IsNullOrWhiteSpace(templateContent))
         {
             throw new ArgumentException("Template content is required.", nameof(templateContent));
         }
 
+        _engine = engine;
         _templateContent = templateContent;
     }
 
@@ -30,8 +31,11 @@ public sealed class HtmlReportWriter : IReportWriter
 
     public async Task WriteAsync(TextWriter writer, ReportContext context, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(writer);
+        ArgumentNullException.ThrowIfNull(context);
+
         var model = new ReportTemplateModel(context);
         var rendered = await _engine.RenderAsync(_templateContent, model, cancellationToken).ConfigureAwait(false);
-        await writer.WriteAsync(rendered).ConfigureAwait(false);
+        await writer.WriteAsync(rendered.AsMemory(), cancellationToken).ConfigureAwait(false);
     }
 }

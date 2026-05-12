@@ -1,12 +1,11 @@
 using System.Text.Json;
-using Maigret.Net.Core;
 using Shouldly;
 
 namespace Maigret.Net.Core.Tests;
 
 public class TestSettings : IDisposable
 {
-    private readonly List<string> _temps = new();
+    private readonly List<string> _temps = [];
 
     private string WriteTemp(string contents)
     {
@@ -46,7 +45,7 @@ public class TestSettings : IDisposable
         var file2 = WriteTemp("""{"timeout": 20, "recursive_search": true}""");
         var file3 = WriteTemp("""{"proxy_url": "http://proxy3", "print_not_found": false}""");
 
-        var settings = Settings.LoadDefaults(new[] { file1, file2, file3 });
+        var settings = Settings.LoadDefaults([file1, file2, file3]);
 
         settings.RetriesCount.ShouldBe(3);
         settings.Timeout.ShouldBe(20);          // last writer wins
@@ -58,7 +57,7 @@ public class TestSettings : IDisposable
     [Fact]
     public void LoadDefaults_MissingPathsAreIgnored()
     {
-        var settings = Settings.LoadDefaults(new[] { Path.Combine(Path.GetTempPath(), "definitely-not-here.json") });
+        var settings = Settings.LoadDefaults([Path.Combine(Path.GetTempPath(), "definitely-not-here.json")]);
         // Embedded defaults still applied:
         settings.MaxConnections.ShouldBe(100);
     }

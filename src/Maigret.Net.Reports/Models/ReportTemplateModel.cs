@@ -2,8 +2,6 @@
 // `IReportTemplateModel` directly or copy the dictionary representation into
 // their own context.
 
-using Maigret.Net.Core;
-
 namespace Maigret.Net.Reports;
 
 /// <summary>
@@ -13,6 +11,8 @@ public sealed class ReportTemplateModel : IReportTemplateModel
 {
     public ReportTemplateModel(ReportContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         Username = context.Username;
         IdType = context.IdType;
         GeneratedAt = context.GeneratedAtIso8601;
@@ -45,7 +45,7 @@ public sealed class ReportTemplateModel : IReportTemplateModel
             }
         }
 
-        Accounts = found
+        Accounts = [.. found
             .OrderBy(r => r.SiteName, StringComparer.Ordinal)
             .Select(r => (IDictionary<string, object?>)new Dictionary<string, object?>
             {
@@ -60,27 +60,24 @@ public sealed class ReportTemplateModel : IReportTemplateModel
                         ["key"] = kv.Key,
                         ["value"] = kv.Value,
                     })
-                    .ToList() ?? new List<IDictionary<string, object?>>(),
-            })
-            .ToList();
+                    .ToList() ?? [],
+            })];
 
-        TagSummary = tagCounts
+        TagSummary = [.. tagCounts
             .OrderByDescending(p => p.Value)
             .Select(p => (IDictionary<string, object?>)new Dictionary<string, object?>
             {
                 ["key"] = p.Key,
                 ["value"] = p.Value,
-            })
-            .ToList();
+            })];
 
-        CountrySummary = countryCounts
+        CountrySummary = [.. countryCounts
             .OrderByDescending(p => p.Value)
             .Select(p => (IDictionary<string, object?>)new Dictionary<string, object?>
             {
                 ["key"] = p.Key,
                 ["value"] = p.Value,
-            })
-            .ToList();
+            })];
     }
 
     public string Username { get; }

@@ -18,15 +18,8 @@ public sealed class ScribanTemplateEngine : ITemplateEngine
 
     public Task<string> RenderAsync(string templateContent, object model, CancellationToken cancellationToken = default)
     {
-        if (templateContent is null)
-        {
-            throw new ArgumentNullException(nameof(templateContent));
-        }
-
-        if (model is null)
-        {
-            throw new ArgumentNullException(nameof(model));
-        }
+        ArgumentNullException.ThrowIfNull(templateContent);
+        ArgumentNullException.ThrowIfNull(model);
 
         var template = GetOrParse(templateContent);
         if (template.HasErrors)

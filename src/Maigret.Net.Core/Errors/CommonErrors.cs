@@ -97,6 +97,8 @@ public static class CommonErrors
     /// </summary>
     public static IReadOnlyList<ErrorStat> ExtractAndGroup(IEnumerable<MaigretCheckResult> results)
     {
+        ArgumentNullException.ThrowIfNull(results);
+
         var counts = new Dictionary<string, int>(StringComparer.Ordinal);
         var total = 0;
         foreach (var r in results)
@@ -110,18 +112,14 @@ public static class CommonErrors
             counts[r.Error.Type] = counts.GetValueOrDefault(r.Error.Type) + 1;
         }
 
-        if (total == 0)
-        {
-            return Array.Empty<ErrorStat>();
-        }
-
-        return counts
+        return total == 0
+            ? []
+            : [.. counts
             .OrderByDescending(p => p.Value)
             .Select(p => new ErrorStat(
                 Type: p.Key,
                 Count: p.Value,
-                Percent: Math.Round(100.0 * p.Value / total, 2)))
-            .ToArray();
+                Percent: Math.Round(100.0 * p.Value / total, 2)))];
     }
 
     /// <summary>True when the error type is "important" enough to warn about.</summary>

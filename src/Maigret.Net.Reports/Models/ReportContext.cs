@@ -3,7 +3,6 @@
 // but as a strongly-typed snapshot.
 
 using System.Globalization;
-using Maigret.Net.Core;
 
 namespace Maigret.Net.Reports;
 
@@ -11,36 +10,28 @@ namespace Maigret.Net.Reports;
 /// Snapshot of search results and metadata fed to <see cref="IReportWriter"/>.
 /// Multiple writers operating on the same context produce different file formats.
 /// </summary>
-public sealed class ReportContext
+public sealed class ReportContext(
+    string username,
+    IEnumerable<MaigretCheckResult> results,
+    string idType = "username",
+    DateTimeOffset? generatedAt = null,
+    IReadOnlyDictionary<string, string>? extras = null)
 {
-    public ReportContext(
-        string username,
-        IEnumerable<MaigretCheckResult> results,
-        string idType = "username",
-        DateTimeOffset? generatedAt = null,
-        IReadOnlyDictionary<string, string>? extras = null)
-    {
-        Username = username;
-        Results = results.ToList();
-        IdType = idType;
-        GeneratedAt = generatedAt ?? DateTimeOffset.Now;
-        Extras = extras ?? new Dictionary<string, string>(0);
-    }
 
     /// <summary>Identifier that was searched for.</summary>
-    public string Username { get; }
+    public string Username { get; } = username;
 
     /// <summary>All probed results (all statuses).</summary>
-    public IReadOnlyList<MaigretCheckResult> Results { get; }
+    public IReadOnlyList<MaigretCheckResult> Results { get; } = [.. results];
 
     /// <summary>Identifier type (default <c>username</c>).</summary>
-    public string IdType { get; }
+    public string IdType { get; } = idType;
 
     /// <summary>Timestamp embedded into the report header.</summary>
-    public DateTimeOffset GeneratedAt { get; }
+    public DateTimeOffset GeneratedAt { get; } = generatedAt ?? DateTimeOffset.Now;
 
     /// <summary>Free-form extras (e.g. CLI flags) made available to template engines.</summary>
-    public IReadOnlyDictionary<string, string> Extras { get; }
+    public IReadOnlyDictionary<string, string> Extras { get; } = extras ?? new Dictionary<string, string>(0);
 
     /// <summary>Filtered claimed accounts.</summary>
     public IEnumerable<MaigretCheckResult> Claimed => Results.Where(r => r.Status == MaigretCheckStatus.Claimed);

@@ -4,27 +4,33 @@
 //
 // Original (MIT) by balestek — https://github.com/balestek
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Maigret.Net.Core.Permutator;
 
 /// <summary>
 /// Combinatorial permutator. Mirrors <c>maigret.permutator.Permute</c>.
 /// </summary>
+[SuppressMessage("Design", "CA1000:Do not declare static members on generic types",
+    Justification = "Permutations<TItem> is a generic helper exposed on Permute<T> for API symmetry with the Python source; moving it to a non-generic sibling type would be a breaking change.")]
 public sealed class Permute<T>
 {
     /// <summary>Default separators applied between joined keys.</summary>
-    public static readonly IReadOnlyList<string> DefaultSeparators = new[] { string.Empty, "_", "-", "." };
+    public static readonly IReadOnlyList<string> DefaultSeparators = [string.Empty, "_", "-", "."];
 
     private readonly IReadOnlyList<KeyValuePair<string, T>> _elements;
     private readonly IReadOnlyList<string> _separators;
 
     public Permute(IEnumerable<KeyValuePair<string, T>> elements, IReadOnlyList<string>? separators = null)
     {
-        _elements = elements?.ToList() ?? throw new ArgumentNullException(nameof(elements));
+        ArgumentNullException.ThrowIfNull(elements);
+
+        _elements = [.. elements];
         _separators = separators ?? DefaultSeparators;
     }
 
     public Permute(IDictionary<string, T> elements, IReadOnlyList<string>? separators = null)
-        : this(elements?.AsEnumerable() ?? Array.Empty<KeyValuePair<string, T>>(), separators)
+        : this(elements?.AsEnumerable() ?? [], separators)
     {
     }
 
@@ -82,6 +88,8 @@ public sealed class Permute<T>
     /// <summary>Yields every k-length permutation of <paramref name="source"/> (Python <c>itertools.permutations</c>).</summary>
     public static IEnumerable<IReadOnlyList<TItem>> Permutations<TItem>(IReadOnlyList<TItem> source, int length)
     {
+        ArgumentNullException.ThrowIfNull(source);
+
         if (length == 0)
         {
             yield return Array.Empty<TItem>();

@@ -1,4 +1,3 @@
-using Maigret.Net.Core;
 using Shouldly;
 
 namespace Maigret.Net.Core.Tests;
@@ -33,7 +32,7 @@ public class TestExecutors
         var executor = new QueueGeneratorExecutor<int>(workersCount: 2, timeout: TimeSpan.FromMilliseconds(50));
         var tasks = new[]
         {
-            (Func<CancellationToken, Task<int>>)(async ct => { await Task.Delay(500, ct).ConfigureAwait(false); return 1; }),
+            async ct => { await Task.Delay(500, ct).ConfigureAwait(false); return 1; },
             (Func<CancellationToken, Task<int>>)(async ct => { await Task.Delay(5, ct).ConfigureAwait(false); return 2; }),
         };
 
@@ -53,7 +52,7 @@ public class TestExecutors
     {
         var executor = new QueueGeneratorExecutor<int>(workersCount: 4);
         var results = new List<int>();
-        await foreach (var r in executor.RunAsync(Array.Empty<Func<CancellationToken, Task<int>>>()).ConfigureAwait(false))
+        await foreach (var r in executor.RunAsync([]).ConfigureAwait(false))
         {
             results.Add(r);
         }
@@ -67,7 +66,7 @@ public class TestExecutors
         var executor = new QueueGeneratorExecutor<int>(workersCount: 2);
         var tasks = new[]
         {
-            (Func<CancellationToken, Task<int>>)(_ => throw new InvalidOperationException("boom")),
+            _ => throw new InvalidOperationException("boom"),
             (Func<CancellationToken, Task<int>>)(_ => Task.FromResult(42)),
         };
 

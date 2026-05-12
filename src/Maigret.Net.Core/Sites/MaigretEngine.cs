@@ -41,7 +41,7 @@ public sealed class MaigretEngine
     public JsonElement Site { get; }
 
     /// <summary>Engine-level presence strings.</summary>
-    public IReadOnlyList<string> PresenseStrs { get; } = Array.Empty<string>();
+    public IReadOnlyList<string> PresenseStrs { get; } = [];
 
     private static List<string> ReadStringList(JsonElement element)
     {

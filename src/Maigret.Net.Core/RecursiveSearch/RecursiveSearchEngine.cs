@@ -35,7 +35,7 @@ public sealed class RecursiveSearchEngine : IRecursiveSearchEngine
         var seedBatch = request.Usernames
             .Where(u => !string.IsNullOrWhiteSpace(u))
             .Select(u => (Id: u, Type: rootIdType))
-            .Where(x => seen.Add(x))
+            .Where(seen.Add)
             .ToList();
 
         if (seedBatch.Count == 0)
@@ -71,7 +71,7 @@ public sealed class RecursiveSearchEngine : IRecursiveSearchEngine
                     }
 
                     var newIds = ParseUsernames(result.IdsData)
-                        .Where(x => seen.Add(x))
+                        .Where(seen.Add)
                         .Take(Math.Max(1, options.MaxIdsPerResult))
                         .ToList();
 

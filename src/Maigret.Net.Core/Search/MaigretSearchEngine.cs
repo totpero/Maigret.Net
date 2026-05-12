@@ -5,7 +5,6 @@
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
-using Maigret.Net.Core.Checkers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -89,11 +88,11 @@ public static class MaigretSearchEngine
 
         if (settings.IgnoreIdsList is not { Count: > 0 })
         {
-            return ranked.Values.ToList();
+            return [.. ranked.Values];
         }
 
         var ignored = new HashSet<string>(settings.IgnoreIdsList, StringComparer.OrdinalIgnoreCase);
-        return ranked.Values.Where(s => !ignored.Contains(s.Name)).ToList();
+        return [.. ranked.Values.Where(s => !ignored.Contains(s.Name))];
     }
 
     /// <summary>
@@ -173,12 +172,7 @@ public static class MaigretSearchEngine
             return long.MaxValue;
         }
 
-        if (filter.TopSites is { } explicitCap && explicitCap > 0)
-        {
-            return explicitCap;
-        }
-
-        return Math.Max(1, settings.TopSitesCount);
+        return filter.TopSites is { } explicitCap && explicitCap > 0 ? explicitCap : Math.Max(1, settings.TopSitesCount);
     }
 
     private static Channel<MaigretCheckResult> CreateChannel(int capacity) =>

@@ -1,7 +1,6 @@
 // Real-network smoke tests. Excluded from default CI runs via the trait below;
 // invoke explicitly with `dotnet test --filter "Category=Integration"`.
 
-using Maigret.Net.Core;
 using Shouldly;
 
 namespace Maigret.Net.Core.Tests.Integration;
@@ -12,7 +11,7 @@ public class SiteIntegrationTests
     private static SearchFilter SiteOnly(string siteName) =>
         new()
         {
-            SiteNames = new[] { siteName },
+            SiteNames = [siteName],
             ScanAllSites = true,  // bypass the top-N cap
             IncludeDisabled = true,
         };

@@ -20,12 +20,7 @@ public static class TagUtils
             return false;
         }
 
-        if (string.Equals(tag, "global", StringComparison.Ordinal))
-        {
-            return true;
-        }
-
-        return CountryTagRegex.IsMatch(tag);
+        return string.Equals(tag, "global", StringComparison.Ordinal) ? true : CountryTagRegex.IsMatch(tag);
     }
 
     /// <summary>

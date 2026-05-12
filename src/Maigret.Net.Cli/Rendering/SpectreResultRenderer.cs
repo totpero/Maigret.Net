@@ -1,4 +1,3 @@
-using Maigret.Net.Core;
 using Spectre.Console;
 
 namespace Maigret.Net.Cli.Rendering;
@@ -21,6 +20,8 @@ public sealed class SpectreResultRenderer : IResultRenderer
 
     public void RenderResult(MaigretCheckResult result, bool printAll)
     {
+        ArgumentNullException.ThrowIfNull(result);
+
         switch (result.Status)
         {
             case MaigretCheckStatus.Claimed:

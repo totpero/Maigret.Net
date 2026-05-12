@@ -1,6 +1,4 @@
 // Port of activation.ParsingActivator.twitter — fetches a Twitter/X guest token.
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -12,21 +10,19 @@ namespace Maigret.Net.Core.Activators;
 /// URL declared in <c>site.activation.url</c> and reading the field named in
 /// <c>site.activation.src</c>.
 /// </summary>
-public sealed class TwitterGuestTokenActivator : ISiteActivator
+public sealed class TwitterGuestTokenActivator(
+    HttpClient client,
+    ILogger<TwitterGuestTokenActivator>? logger = null) : ISiteActivator
 {
-    private readonly HttpClient _client;
-    private readonly ILogger _logger;
-
-    public TwitterGuestTokenActivator(HttpClient client, ILogger<TwitterGuestTokenActivator>? logger = null)
-    {
-        _client = client ?? throw new ArgumentNullException(nameof(client));
-        _logger = (ILogger?)logger ?? NullLogger.Instance;
-    }
+    private readonly HttpClient _client = client ?? throw new ArgumentNullException(nameof(client));
+    private readonly ILogger _logger = (ILogger?)logger ?? NullLogger.Instance;
 
     public string Method => "twitter";
 
     public async Task ActivateAsync(MaigretSite site, string? probedUrl, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(site);
+
         if (!site.Activation.TryGetProperty(ActivationKeys.Url, out var urlEl) || urlEl.ValueKind != JsonValueKind.String)
         {
             throw new InvalidOperationException($"Twitter activation for {site.Name} is missing '{ActivationKeys.Url}'.");

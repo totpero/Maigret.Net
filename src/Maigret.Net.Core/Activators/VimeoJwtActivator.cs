@@ -1,5 +1,4 @@
 // Port of activation.ParsingActivator.vimeo — fetches the viewer JWT.
-using System.Net.Http;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -10,21 +9,19 @@ namespace Maigret.Net.Core.Activators;
 /// Refreshes Vimeo's <c>Authorization</c> header by GETting the activation URL
 /// and reading <c>jwt</c>. Result is stored as <c>jwt &lt;token&gt;</c>.
 /// </summary>
-public sealed class VimeoJwtActivator : ISiteActivator
+public sealed class VimeoJwtActivator(
+    HttpClient client,
+    ILogger<VimeoJwtActivator>? logger = null) : ISiteActivator
 {
-    private readonly HttpClient _client;
-    private readonly ILogger _logger;
-
-    public VimeoJwtActivator(HttpClient client, ILogger<VimeoJwtActivator>? logger = null)
-    {
-        _client = client ?? throw new ArgumentNullException(nameof(client));
-        _logger = (ILogger?)logger ?? NullLogger.Instance;
-    }
+    private readonly HttpClient _client = client ?? throw new ArgumentNullException(nameof(client));
+    private readonly ILogger _logger = (ILogger?)logger ?? NullLogger.Instance;
 
     public string Method => "vimeo";
 
     public async Task ActivateAsync(MaigretSite site, string? probedUrl, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(site);
+
         if (!site.Activation.TryGetProperty(ActivationKeys.Url, out var urlEl) || urlEl.ValueKind != JsonValueKind.String)
         {
             throw new InvalidOperationException($"Vimeo activation for {site.Name} is missing '{ActivationKeys.Url}'.");

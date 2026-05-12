@@ -1,4 +1,3 @@
-using Maigret.Net.Core.Checkers;
 using Microsoft.Extensions.Logging;
 
 namespace Maigret.Net.Core.Search;

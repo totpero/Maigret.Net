@@ -3,8 +3,8 @@
 // checksum_indexes, checksum_constant, format) are stored in data.json under
 // `OnlyFans.activation` and rotate upstream every 1–3 weeks.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -17,21 +17,19 @@ namespace Maigret.Net.Core.Activators;
 /// Computes the rotating signed headers (<c>time</c>, <c>sign</c>) expected by
 /// the OnlyFans API. On first call also fetches the bootstrap cookies.
 /// </summary>
-public sealed class OnlyFansSignatureActivator : ISiteActivator
+public sealed class OnlyFansSignatureActivator(
+    HttpClient client,
+    ILogger<OnlyFansSignatureActivator>? logger = null) : ISiteActivator
 {
-    private readonly HttpClient _client;
-    private readonly ILogger _logger;
-
-    public OnlyFansSignatureActivator(HttpClient client, ILogger<OnlyFansSignatureActivator>? logger = null)
-    {
-        _client = client ?? throw new ArgumentNullException(nameof(client));
-        _logger = (ILogger?)logger ?? NullLogger.Instance;
-    }
+    private readonly HttpClient _client = client ?? throw new ArgumentNullException(nameof(client));
+    private readonly ILogger _logger = (ILogger?)logger ?? NullLogger.Instance;
 
     public string Method => "onlyfans";
 
     public async Task ActivateAsync(MaigretSite site, string? probedUrl, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(site);
+
         var act = site.Activation;
         var staticParam = ReadString(act, "static_param") ?? throw MissingField(site, "static_param");
         var indexes = ReadIntArray(act, "checksum_indexes") ?? throw MissingField(site, "checksum_indexes");
@@ -85,6 +83,8 @@ public sealed class OnlyFansSignatureActivator : ISiteActivator
         _logger.LogDebug("OnlyFans signed {Path} time={Time}", targetPath, time);
     }
 
+    [SuppressMessage("Security", "CA5350:Do not use weak cryptographic algorithms",
+        Justification = "SHA1 is mandated by the OnlyFans request-signing protocol; this is not used for confidentiality or integrity of secrets.")]
     private static (string Time, string Sign) Sign(string path, string staticParam, string userId, int[] indexes, int constant, string format)
     {
         var t = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(CultureInfo.InvariantCulture);
@@ -132,7 +132,7 @@ public sealed class OnlyFansSignatureActivator : ISiteActivator
                 list.Add(v);
             }
         }
-        return list.ToArray();
+        return [.. list];
     }
 
     private static InvalidOperationException MissingField(MaigretSite site, string field) =>

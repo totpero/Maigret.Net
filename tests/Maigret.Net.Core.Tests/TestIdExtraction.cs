@@ -1,7 +1,5 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using Maigret.Net.Core;
-using Maigret.Net.Core.IdExtraction;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 
@@ -53,11 +51,11 @@ public class TestIdExtraction
     [Fact]
     public void RuleBasedExtractor_HtmlEntities_AreDecoded()
     {
-        var rule = new ExtractionRule("Foo", new[]
-        {
+        var rule = new ExtractionRule("Foo",
+        [
             new ExtractionPattern("name", new Regex(@"name=""([^""]+)""")),
-        });
-        var extractor = new RuleBasedIdExtractor(new[] { rule });
+        ]);
+        var extractor = new RuleBasedIdExtractor([rule]);
         var result = extractor.Extract("""<meta name="Alex &amp; Bob">""", Site("Foo"));
 
         result["name"].ShouldBe("Alex & Bob");
@@ -66,12 +64,12 @@ public class TestIdExtraction
     [Fact]
     public void RuleBasedExtractor_FirstMatch_Wins()
     {
-        var rule = new ExtractionRule("Foo", new[]
-        {
+        var rule = new ExtractionRule("Foo",
+        [
             new ExtractionPattern("name", new Regex(@"a=([a-z]+)")),
             new ExtractionPattern("name", new Regex(@"b=([a-z]+)")),
-        });
-        var extractor = new RuleBasedIdExtractor(new[] { rule });
+        ]);
+        var extractor = new RuleBasedIdExtractor([rule]);
         var result = extractor.Extract("a=alpha b=beta", Site("Foo"));
 
         result["name"].ShouldBe("alpha");
@@ -98,10 +96,10 @@ public class TestIdExtraction
     {
         var services = new ServiceCollection();
         services.AddMaigret();
-        services.AddSingleton(new ExtractionRule("CustomSite", new[]
-        {
+        services.AddSingleton(new ExtractionRule("CustomSite",
+        [
             new ExtractionPattern("answer", new Regex(@"answer=(\d+)")),
-        }));
+        ]));
         services.AddMaigretIdExtraction();
 
         var sp = services.BuildServiceProvider();

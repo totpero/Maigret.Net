@@ -2,7 +2,6 @@
 // State-less: a single instance can be shared across many concurrent workers
 // because HttpClient itself is thread-safe.
 using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
@@ -200,6 +199,7 @@ public class SimpleHttpChecker : ICheckerBase
             _client.Dispose();
         }
 
+        GC.SuppressFinalize(this);
         return ValueTask.CompletedTask;
     }
 }

@@ -35,7 +35,7 @@ public sealed class Settings
     public string? CookieJarFile { get; set; }
 
     [JsonPropertyName("ignore_ids_list")]
-    public List<string> IgnoreIdsList { get; set; } = new();
+    public List<string> IgnoreIdsList { get; set; } = [];
 
     [JsonPropertyName("reports_path")]
     public string ReportsPath { get; set; } = "reports";
@@ -62,7 +62,7 @@ public sealed class Settings
     public bool ScanDisabledSites { get; set; }
 
     [JsonPropertyName("scan_sites_list")]
-    public List<string> ScanSitesList { get; set; } = new();
+    public List<string> ScanSitesList { get; set; } = [];
 
     [JsonPropertyName("self_check_enabled")]
     public bool SelfCheckEnabled { get; set; }
@@ -131,10 +131,10 @@ public sealed class Settings
     // -- submit mode ---------------------------------------------------------------
 
     [JsonPropertyName("presence_strings")]
-    public List<string> PresenceStrings { get; set; } = new();
+    public List<string> PresenceStrings { get; set; } = [];
 
     [JsonPropertyName("supposed_usernames")]
-    public List<string> SupposedUsernames { get; set; } = new();
+    public List<string> SupposedUsernames { get; set; } = [];
 
     /// <summary>
     /// Returns the cascade of paths the Python version walks when no explicit
@@ -146,11 +146,11 @@ public sealed class Settings
         get
         {
             var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            return new[]
-            {
+            return
+            [
                 Path.Combine(home, ".maigret", "settings.json"),
                 Path.Combine(Directory.GetCurrentDirectory(), "settings.json"),
-            };
+            ];
         }
     }
 

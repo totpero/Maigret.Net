@@ -1,5 +1,3 @@
-using Maigret.Net.Core;
-
 namespace Maigret.Net.Reports.Writers;
 
 /// <summary>Markdown report writer mirroring <c>generate_markdown_report</c>.</summary>
@@ -10,6 +8,9 @@ public sealed class MarkdownReportWriter : IReportWriter
 
     public Task WriteAsync(TextWriter writer, ReportContext context, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(writer);
+        ArgumentNullException.ThrowIfNull(context);
+
         var found = context.Claimed.ToList();
         var idLabel = string.IsNullOrEmpty(context.IdType) ? "username" : context.IdType;
 

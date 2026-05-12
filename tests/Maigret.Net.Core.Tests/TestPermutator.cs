@@ -1,4 +1,3 @@
-using Maigret.Net.Core;
 using Shouldly;
 
 namespace Maigret.Net.Core.Tests;
@@ -68,10 +67,10 @@ public class TestPermutator
     [Fact]
     public void Permutations_Simple_MatchesItertools()
     {
-        var perms = Permute<int>.Permutations(new[] { 1, 2, 3 }, 2)
+        var perms = Permute<int>.Permutations([1, 2, 3], 2)
             .Select(list => string.Join(",", list))
             .OrderBy(s => s, StringComparer.Ordinal)
             .ToArray();
-        perms.ShouldBe(new[] { "1,2", "1,3", "2,1", "2,3", "3,1", "3,2" });
+        perms.ShouldBe(["1,2", "1,3", "2,1", "2,3", "3,1", "3,2"]);
     }
 }

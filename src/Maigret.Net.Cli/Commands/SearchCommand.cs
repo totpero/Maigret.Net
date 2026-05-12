@@ -23,6 +23,8 @@ public sealed class SearchCommand(
 {
     protected override async Task<int> ExecuteAsync(CommandContext context, SearchCommandSettings cli, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(cli);
+
         if (cli.NoColor)
         {
             AnsiConsole.Profile.Capabilities.ColorSystem = ColorSystem.NoColors;
@@ -76,7 +78,7 @@ public sealed class SearchCommand(
 
                 var searchRequest = new MaigretSearchRequest
                 {
-                    Usernames = new[] { username },
+                    Usernames = [username],
                     Database = database,
                     Settings = settings,
                     Filter = filter,
@@ -159,7 +161,7 @@ public sealed class SearchCommand(
             renderer.RenderError(
                 $"No registered IReportWriter for format(s) [{string.Join(", ", unsupported)}]. " +
                 $"Available: [{string.Join(", ", reportPipeline.AvailableFormats)}].");
-            formats.RemoveAll(f => unsupported.Contains(f));
+            formats.RemoveAll(unsupported.Contains);
         }
 
         if (formats.Count == 0)
@@ -258,7 +260,7 @@ public sealed class SearchCommand(
         if (permute && usernames.Count > 1 && string.Equals(idType, "username", StringComparison.Ordinal))
         {
             var seed = usernames.ToDictionary(u => u, u => u, StringComparer.Ordinal);
-            return new Permute<string>(seed).Gather(PermuteMode.Strict).Keys.ToList();
+            return [.. new Permute<string>(seed).Gather(PermuteMode.Strict).Keys];
         }
 
         var list = new List<string>(usernames.Count);

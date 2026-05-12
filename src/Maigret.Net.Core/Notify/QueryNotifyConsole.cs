@@ -5,27 +5,18 @@ namespace Maigret.Net.Core.Notify;
 /// prints search start, per-result lines (with <c>[+] / [-] / [?]</c> markers),
 /// and a final message.
 /// </summary>
-public class QueryNotifyConsole : QueryNotify
+public class QueryNotifyConsole(
+    bool verbose = false,
+    bool printFoundOnly = false,
+    bool skipCheckErrors = false,
+    bool color = true,
+    bool silent = false) : QueryNotify
 {
-    public QueryNotifyConsole(
-        bool verbose = false,
-        bool printFoundOnly = false,
-        bool skipCheckErrors = false,
-        bool color = true,
-        bool silent = false)
-    {
-        Verbose = verbose;
-        PrintFoundOnly = printFoundOnly;
-        SkipCheckErrors = skipCheckErrors;
-        Color = color;
-        Silent = silent;
-    }
-
-    public bool Verbose { get; }
-    public bool PrintFoundOnly { get; }
-    public bool SkipCheckErrors { get; }
-    public bool Color { get; }
-    public bool Silent { get; }
+    public bool Verbose { get; } = verbose;
+    public bool PrintFoundOnly { get; } = printFoundOnly;
+    public bool SkipCheckErrors { get; } = skipCheckErrors;
+    public bool Color { get; } = color;
+    public bool Silent { get; } = silent;
 
     public override void Start(string? message = null, string idType = "username")
     {
@@ -46,6 +37,8 @@ public class QueryNotifyConsole : QueryNotify
 
     public override void Update(MaigretCheckResult result, bool isSimilar = false)
     {
+        ArgumentNullException.ThrowIfNull(result);
+
         base.Update(result, isSimilar);
         if (Silent)
         {

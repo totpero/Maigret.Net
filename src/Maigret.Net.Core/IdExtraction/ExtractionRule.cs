@@ -8,19 +8,14 @@ namespace Maigret.Net.Core.IdExtraction;
 /// <summary>
 /// One pattern that captures a single field's value out of a profile page.
 /// </summary>
-public sealed class ExtractionPattern
+public sealed class ExtractionPattern(string field, Regex regex)
 {
-    public ExtractionPattern(string field, Regex regex)
-    {
-        Field = field;
-        Regex = regex;
-    }
 
     /// <summary>Result key (e.g. <c>username</c>, <c>fullname</c>, <c>email</c>).</summary>
-    public string Field { get; }
+    public string Field { get; } = field;
 
     /// <summary>Regex with at least one capture group; the first group becomes the value.</summary>
-    public Regex Regex { get; }
+    public Regex Regex { get; } = regex;
 
     /// <summary>Builds an extraction pattern from a regex string.</summary>
     public static ExtractionPattern FromString(string field, string regex, RegexOptions options = RegexOptions.Compiled) =>
@@ -41,7 +36,7 @@ public sealed class ExtractionRule
         }
 
         SiteName = siteName;
-        Patterns = patterns.ToArray();
+        Patterns = [.. patterns];
     }
 
     /// <summary>Maigret site name this rule targets (exact match, case-insensitive).</summary>

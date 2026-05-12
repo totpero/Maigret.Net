@@ -22,7 +22,7 @@ public class TestMaigretClient
             "octocat",
             new MaigretSearchOptions
             {
-                Tags = new[] { "tag-that-does-not-exist-anywhere" },
+                Tags = ["tag-that-does-not-exist-anywhere"],
             }).ConfigureAwait(false);
 
         summary.Username.ShouldBe("octocat");
@@ -50,7 +50,7 @@ public class TestMaigretClient
                            "octocat",
                            new MaigretSearchOptions
                            {
-                               Tags = new[] { "no-such-tag" },
+                               Tags = ["no-such-tag"],
                            }).ConfigureAwait(false))
         {
             count++;
@@ -65,13 +65,13 @@ public class TestMaigretClient
         var aliceMissing = new MaigretCheckResult("alice", "BarSite", "https://bar/alice", MaigretCheckStatus.Available);
         var bobClaimed = new MaigretCheckResult("bob", "FooSite", "https://foo/bob", MaigretCheckStatus.Claimed);
 
-        var summary = new MaigretSearchSummary("alice", new[] { aliceClaimed, aliceMissing, bobClaimed }, TimeSpan.FromSeconds(1));
+        var summary = new MaigretSearchSummary("alice", [aliceClaimed, aliceMissing, bobClaimed], TimeSpan.FromSeconds(1));
 
         summary.FoundCount.ShouldBe(2);
         summary.AnyFound.ShouldBeTrue();
         summary.ClaimedSites.Count().ShouldBe(2);
         summary.AvailableSites.Count().ShouldBe(1);
-        summary.ClaimedByUsername.Keys.ShouldBe(new[] { "alice", "bob" }, ignoreOrder: true);
+        summary.ClaimedByUsername.Keys.ShouldBe(["alice", "bob"], ignoreOrder: true);
         summary.ClaimedByUsername["alice"].Count.ShouldBe(1);
     }
 
