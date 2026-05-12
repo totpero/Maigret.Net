@@ -1,4 +1,4 @@
-namespace Maigret.Net.Reports;
+namespace Maigret.Net.Reports.Abstractions;
 
 /// <summary>
 /// Minimal model fed to template engines. Members are exposed as plain dictionary

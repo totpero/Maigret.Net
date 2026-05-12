@@ -1,4 +1,3 @@
-using Maigret.Net.Cli;
 using Maigret.Net.Cli.Infrastructure;
 using Maigret.Net.Cli.Rendering;
 using Maigret.Net.Reports.Scriban;

@@ -243,20 +243,6 @@ dotnet_diagnostic.CA1859.severity = none
 dotnet_diagnostic.CA5359.severity = none
 
 # -----------------------------------------------------------------------------
-# Namespace-flatness exceptions (Microsoft-style: keep API public surface flat
-# at the package root, only "implementation" folders carry sub-namespaces).
-# -----------------------------------------------------------------------------
-
-[src/Maigret.Net.Reports/Abstractions/*.cs]
-dotnet_diagnostic.IDE0130.severity = none
-
-[src/Maigret.Net.Reports/Models/*.cs]
-dotnet_diagnostic.IDE0130.severity = none
-
-[src/Maigret.Net.Cli/Commands/*.cs]
-dotnet_diagnostic.IDE0130.severity = none
-
-# -----------------------------------------------------------------------------
 # Test-project overrides (xUnit `Method_Scenario_Expected` naming is idiomatic)
 # -----------------------------------------------------------------------------
 

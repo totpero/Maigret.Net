@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using Spectre.Console.Cli;
 
-namespace Maigret.Net.Cli;
+namespace Maigret.Net.Cli.Commands;
 
 /// <summary>
 /// Command-line options for <see cref="SearchCommand"/>. Mirrors the relevant

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-namespace Maigret.Net.Cli;
+namespace Maigret.Net.Cli.Commands;
 
 /// <summary>
 /// CLI entry point — port of <c>maigret/maigret.py main()</c>. Wires the

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "rider": {
+      "command": "npx",
+      "args": ["-y", "@jetbrains/mcp-proxy"],
+      "env": {
+        "LOG_ENABLED": "false"
+      }
+    }
+  }
+}

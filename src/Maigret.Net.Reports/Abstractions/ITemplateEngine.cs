@@ -1,7 +1,7 @@
 // Template engine abstraction. Maigret.Net.Reports.Scriban supplies the default
 // implementation; consumers can plug in Razor, Liquid, Handlebars, etc.
 
-namespace Maigret.Net.Reports;
+namespace Maigret.Net.Reports.Abstractions;
 
 /// <summary>
 /// Renders an arbitrary text template against a context object. The engine is

@@ -2,7 +2,7 @@
 // resolved via DI; consumers iterate `IEnumerable<IReportWriter>` and pick by
 // `FormatId`.
 
-namespace Maigret.Net.Reports;
+namespace Maigret.Net.Reports.Abstractions;
 
 /// <summary>
 /// One report format. Implementations are stateless and may be shared across

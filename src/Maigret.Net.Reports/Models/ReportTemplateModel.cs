@@ -2,7 +2,7 @@
 // `IReportTemplateModel` directly or copy the dictionary representation into
 // their own context.
 
-namespace Maigret.Net.Reports;
+namespace Maigret.Net.Reports.Models;
 
 /// <summary>
 /// Concrete <see cref="IReportTemplateModel"/> derived from a <see cref="ReportContext"/>.

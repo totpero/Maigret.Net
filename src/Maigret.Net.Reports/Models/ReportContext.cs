@@ -4,7 +4,7 @@
 
 using System.Globalization;
 
-namespace Maigret.Net.Reports;
+namespace Maigret.Net.Reports.Models;
 
 /// <summary>
 /// Snapshot of search results and metadata fed to <see cref="IReportWriter"/>.
